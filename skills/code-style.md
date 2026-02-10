@@ -1,40 +1,123 @@
 # Skill: Code Style
 
-## Overview
-We adhere to **PSR-12** and **Laravel Best Practices**. Consistency is key.
+You are a Software Engineer who writes clean, readable, and strictly typed PHP code. You follow PSR-12 as the baseline and extend it with Laravel-specific conventions and stricter typing rules. Consistency is non-negotiable. Every file you touch must look like every other file in the codebase, as if one person wrote the entire project.
 
-## 📝 General Rules
--   **Indentation**: 4 spaces.
--   **Line Length**: Soft limit 120 characters.
--   **Strict Types**: All PHP files MUST start with `declare(strict_types=1);`.
+## Strict Types Declaration
 
-## 🧬 PHP Conventions
--   **Class Names**: PascalCase (e.g., `PaymentService`).
--   **Method/Variable Names**: camelCase (e.g., `processPayment`).
--   **Constants**: UPPER_SNAKE_CASE.
+Every PHP file you create MUST begin with the strict types declaration. No exceptions.
 
-### Type Hinting
-ALWAYS type hint arguments and return types.
-
-**Bad:**
 ```php
+<?php
+
+declare(strict_types=1);
+```
+
+## Naming Conventions
+
+Classes, interfaces, traits, and enums use PascalCase:
+```
+UserService, OrderRepository, PaymentGatewayInterface, OrderStatus
+```
+
+Methods and variables use camelCase:
+```
+$orderTotal, processPayment(), findActiveUsers()
+```
+
+Constants use UPPER_SNAKE_CASE:
+```
+MAX_LOGIN_ATTEMPTS, DEFAULT_CURRENCY, CACHE_TTL_SECONDS
+```
+
+Database columns and table names use snake_case:
+```
+users, order_items, created_at, is_active
+```
+
+Configuration keys use dot-separated lowercase:
+```
+config('payment.gateway.timeout')
+```
+
+## Type Hinting
+
+You MUST type hint every method parameter, return type, and property. Use union types and nullable types where appropriate. Never leave a method signature ambiguous.
+
+```php
+// WRONG: No type information. Impossible to reason about without reading the implementation.
 public function getUser($id) {
     return User::find($id);
 }
-```
 
-**Good:**
-```php
+// CORRECT: Fully typed. Self-documenting.
 public function getUser(int $id): ?User
 {
     return User::find($id);
 }
+
+// Complex return types
+public function processPayment(PaymentDTO $data): PaymentResult|PaymentFailure
+{
+    // ...
+}
+
+// Typed properties with constructor promotion
+public function __construct(
+    private readonly OrderRepositoryInterface $orderRepo,
+    private readonly PaymentGatewayInterface $gateway,
+    private readonly LoggerInterface $logger,
+) {}
 ```
 
-## 💅 Tools
--   **PHP CS Fixer**: Run before pushing.
--   **Larastan**: Level 5 minimum.
+## Class Design Rules
 
-## 📂 File Organization
--   Classes must be in their dedicated namespaces matching directory structure.
--   One class per file.
+1. One class per file. Always.
+2. Classes should be `final` by default unless explicitly designed for extension.
+3. Prefer composition over inheritance. Use traits sparingly and only for framework requirements (e.g., `HasFactory`, `SoftDeletes`).
+4. Constructor promotion is preferred for injected dependencies.
+5. Properties should be `readonly` when they are set once and never changed.
+
+```php
+final class PlaceOrderAction
+{
+    public function __construct(
+        private readonly OrderRepositoryInterface $orders,
+        private readonly StockCheckerInterface $stockChecker,
+    ) {}
+
+    public function execute(PlaceOrderDTO $dto): Order
+    {
+        // ...
+    }
+}
+```
+
+## Method Length and Complexity
+
+A method should do one thing. If a method exceeds 20 lines of logic (excluding blank lines and comments), it is a signal that it should be decomposed. Cyclomatic complexity should not exceed 5 per method. If you find yourself nesting more than 2 levels of conditionals, extract the inner logic into a private method or a separate class.
+
+## Static Analysis
+
+You run Larastan (PHPStan for Laravel) at level 5 or higher. All code must pass without errors before merging. You also run PHP CS Fixer with the project's `.php-cs-fixer.dist.php` configuration before every commit.
+
+```bash
+# Run static analysis
+./vendor/bin/phpstan analyse --memory-limit=512M
+
+# Run code formatting
+./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
+```
+
+## Comments
+
+Code should be self-documenting through clear naming. Comments explain WHY, never WHAT. If you feel the need to write a comment explaining what code does, rename the variable or extract a method instead.
+
+```php
+// WRONG: The comment restates the code
+// Get the user
+$user = User::find($id);
+
+// CORRECT: The comment explains business context
+// Guest users get a temporary cart that expires after 24 hours
+$cart = $this->getOrCreateGuestCart($sessionId, ttl: 86400);
+```
