@@ -8,12 +8,14 @@ This repository is a collection of markdown files that define **AI agent persona
 
 **Think of it as an AI team you can clone.**
 
-| Agent | Specialisation | Invoke with |
-|-------|---------------|-------------|
-| 🏗️ **@backend** | Laravel, DDD, modular architecture | `@workspace using @backend, ...` |
-| 🧪 **@tester** | PHPUnit, TDD, test coverage | `@workspace using @tester, ...` |
-| 🔍 **@reviewer** | Code review, quality gates | `@workspace using @reviewer, ...` |
-| 🛡️ **@security** | OWASP Top 10, vulnerability auditing | `@workspace using @security, ...` |
+| Agent | Specialisation | Slash Command |
+|-------|---------------|---------------|
+| 🏗️ **@backend** | Laravel, DDD, modular architecture | `/backend` |
+| 🧪 **@tester** | PHPUnit, TDD, test coverage | `/tester` |
+| 🔍 **@reviewer** | Code review, quality gates | `/review` |
+| 🛡️ **@security** | OWASP Top 10, vulnerability auditing | `/security` |
+
+Plus task-specific commands: `/generate-tests`, `/new-module`, `/refactor`
 
 ## 🚀 Quick Start
 
@@ -34,35 +36,49 @@ That's it. No `npm install`. No build step. Just open VS Code and start chatting
 
 ### Usage
 
-Open Copilot Chat (`Ctrl+Shift+I`) and type:
+Open Copilot Chat (`Ctrl+Shift+I`) and type a slash command:
 
 ```
-@workspace using @backend, implement a new Payment module
-```
-
-```
-@workspace using @tester, generate PHPUnit tests for the active file
+/backend implement a new Payment module
 ```
 
 ```
-@workspace using @reviewer, review this code
+/tester generate PHPUnit tests for the active file
 ```
 
 ```
-@workspace using @security, audit this file for vulnerabilities
+/review review this code
 ```
 
-You can also combine agents with prompt templates for more structured output:
+```
+/security audit this file for vulnerabilities
+```
+
+Or use task-specific commands:
 
 ```
-@workspace using @tester and the generate-tests prompt, write tests for this file
+/generate-tests
+/new-module Payment
+/refactor
 ```
+
+> **Alternative:** You can also use `@workspace` mentions:
+> `@workspace using @backend, implement a new Payment module`
 
 ## 📁 Repository Structure
 
 ```
 .
-├── AGENTS.md                          # Root index — start here
+├── AGENTS.md                          # Root orchestrator — Copilot reads this first
+│
+├── .vscode/prompts/                   # ⚡ Slash command entry points
+│   ├── backend.prompt.md              # /backend
+│   ├── tester.prompt.md               # /tester
+│   ├── review.prompt.md               # /review
+│   ├── security.prompt.md             # /security
+│   ├── generate-tests.prompt.md       # /generate-tests
+│   ├── new-module.prompt.md           # /new-module
+│   └── refactor.prompt.md             # /refactor
 │
 ├── .ai/
 │   ├── agents/                        # Agent personas
@@ -102,24 +118,28 @@ You can also combine agents with prompt templates for more structured output:
 ## 🛠 How It Works
 
 ```
-User: @workspace using @backend, ...
-         │
-         ▼
-┌─ Copilot Chat ──────────────────────┐
-│  Reads AGENTS.md as entry point     │
-│  Follows reference to agent file    │
-│  Loads referenced skills & rules    │
-│  Adopts agent persona               │
-│  Applies constraints                │
-│  Generates response                 │
+User types: /backend implement Payment module
+               │
+               ▼
+┌─ .vscode/prompts/backend.prompt.md ─┐
+│  Copilot loads this prompt file     │
+│  #file: references pull in:        │
+│    → .ai/agents/backend.agent.md   │
+│    → .ai/skills/laravel-modules.md │
+│    → .ai/skills/eloquent-perf.md   │
+│    → .ai/rules/modular-arch.md     │
+│    → .ai/rules/services.md         │
+│  All combined into one context     │
+│  Copilot adopts persona + rules    │
+│  Generates specialized response    │
 └─────────────────────────────────────┘
 ```
 
-1. `AGENTS.md` serves as the root orchestrator — Copilot reads it first
-2. Each **agent** file defines a persona, responsibilities, and constraints
-3. Agents reference **skills** (how-to knowledge) and **rules** (strict mandates)
-4. **Prompts** provide structured task templates for common workflows
-5. Copilot combines all of this into contextual, specialized responses
+1. `.vscode/prompts/*.md` files register as **native slash commands** in Copilot Chat
+2. Each prompt file uses `#file:` references to pull in **agent + skills + rules**
+3. Copilot automatically resolves all `#file:` references and loads the full context
+4. The agent **persona**, **skills**, and **rules** shape the response
+5. No build, no runtime, no extension — just markdown composition
 
 ## 💬 How Mentions Work
 
@@ -205,11 +225,9 @@ For example: "Return complete, runnable code" or "Use severity-tiered review for
 | **@my-agent** | [my-agent.agent.md](.ai/agents/my-agent.agent.md) | What it specialises in |
 ```
 
-**Step 4:** Use it in Copilot Chat:
+**Step 4:** Create a slash command for it in `.vscode/prompts/devops.prompt.md` (see below).
 
-```
-@workspace using @my-agent, do something
-```
+**Step 5:** Use it: `/devops write a Dockerfile for this Laravel app`
 
 #### Example: Creating a `@devops` Agent
 
@@ -219,7 +237,7 @@ For example: "Return complete, runnable code" or "Use severity-tiered review for
 # Agent: DevOps Engineer
 
 > **Role:** Senior DevOps Engineer & Infrastructure Specialist
-> **Use in Copilot Chat:** `@workspace using @devops, <your request>`
+> **Use in Copilot Chat:** `/devops <your request>`
 
 ## Persona
 
@@ -256,8 +274,60 @@ everything and treat infrastructure as code.
 - Specify exact versions for base images and dependencies
 ```
 
-2. Add to `AGENTS.md` agents table.
-3. Done. Use it: `@workspace using @devops, write a Dockerfile for this Laravel app`
+2. Create `.vscode/prompts/devops.prompt.md` (see next section).
+3. Add to `AGENTS.md` agents table.
+4. Done. Use it: `/devops write a Dockerfile for this Laravel app`
+
+---
+
+### ⚡ Adding a Custom Slash Command
+
+Every `.md` file in `.vscode/prompts/` becomes a native slash command automatically.
+
+**Step 1:** Create a new file:
+
+```
+.vscode/prompts/{command-name}.prompt.md
+```
+
+The filename becomes the command name: `devops.prompt.md` → `/devops`
+
+**Step 2:** Use this template:
+
+```markdown
+---
+mode: 'agent'
+description: '{Short description shown in Copilot command list}'
+---
+
+You are the **@{agent-name}** agent. Read and adopt the full persona below.
+
+# Agent Definition
+
+#file:../../.ai/agents/{agent-name}.agent.md
+
+# Required Skills
+
+#file:../../.ai/skills/{skill-1}.md
+#file:../../.ai/skills/{skill-2}.md
+
+# Required Rules
+
+#file:../../.ai/rules/{rule-1}.md
+#file:../../.ai/rules/{rule-2}.md
+
+# Instructions
+
+1. Adopt the @{agent-name} persona completely
+2. Apply ALL referenced skills as practical knowledge
+3. Enforce ALL referenced rules as non-negotiable constraints
+4. {Specific output instructions for this command}
+```
+
+> **Key:** The `#file:` syntax tells Copilot to load the referenced file as context.
+> Paths are relative to the prompt file location (`.vscode/prompts/`).
+
+**Step 3:** The command is immediately available in Copilot Chat — just type `/` and your command name.
 
 ---
 

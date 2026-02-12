@@ -13,29 +13,36 @@ This repository is a **prompt-first, markdown-driven AI knowledge base** designe
 ### Architecture
 
 ```
-.ai/
-  agents/     → Personas with responsibilities, constraints, and cross-references
-  skills/     → Practical how-to guides and technical knowledge
-  rules/      → Strict mandates that must never be violated
-  prompts/    → Reusable task templates for common workflows
+.vscode/prompts/  → Slash command entry points (loaded by Copilot automatically)
+.ai/agents/       → Personas with responsibilities, constraints, and cross-references
+.ai/skills/       → Practical how-to guides and technical knowledge
+.ai/rules/        → Strict mandates that must never be violated
+.ai/prompts/      → Reusable task templates for common workflows
 ```
 
-### How to Use in Copilot Chat
+### How to Use — Slash Commands (Recommended)
 
-Reference `@workspace` to give Copilot access to this knowledge base, then specify which agent to use:
+Each file in `.vscode/prompts/` becomes a native Copilot Chat slash command. Just type `/` in Copilot Chat:
+
+| Command | Agent | What it does |
+|---------|-------|-------------|
+| `/backend` | @backend | Laravel backend engineering, DDD module design |
+| `/tester` | @tester | PHPUnit test development, TDD |
+| `/review` | @reviewer | Structured code review with severity tiers |
+| `/security` | @security | OWASP security audit with vulnerability classification |
+| `/generate-tests` | @tester | Generate comprehensive tests for the current file |
+| `/new-module` | @backend | Scaffold a full DDD Laravel module |
+| `/refactor` | @backend | Refactor code for clean architecture |
+
+Each slash command automatically loads the correct agent persona, skills, and rules via `#file:` references.
+
+### How to Use — @workspace (Alternative)
+
+You can also reference the knowledge base directly via `@workspace`:
 
 ```
 @workspace using @backend, implement a new Payment module
-@workspace using @tester, generate PHPUnit tests for this file
-@workspace using @reviewer, review this code
-@workspace using @security, audit this file for security vulnerabilities
-```
-
-You can also combine agents with prompt templates:
-
-```
-@workspace using @tester and the generate-tests prompt, write tests for the active file
-@workspace using @backend and the new-module prompt, scaffold an Inventory module
+@workspace using @tester and the generate-tests prompt, write tests for this file
 ```
 
 ---
