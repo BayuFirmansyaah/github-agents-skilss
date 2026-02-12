@@ -121,28 +121,245 @@ User: @workspace using @backend, ...
 4. **Prompts** provide structured task templates for common workflows
 5. Copilot combines all of this into contextual, specialized responses
 
-## ✏️ Customisation
+## 💬 How Mentions Work
 
-### Add a New Agent
+Every file in `.ai/` is part of the workspace knowledge that Copilot Chat can read. When you type `@workspace`, Copilot scans the repository and uses the markdown files as context.
 
-1. Create `.ai/agents/your-agent.agent.md` following the template in [AGENTS.md](AGENTS.md#creating-new-agents)
-2. Add a row to the Agents table in `AGENTS.md`
-3. Done — no build, no compilation
+To invoke a specific agent or prompt, **mention it by name** in your message:
 
-### Add a New Skill or Rule
+| What you want | How to mention it |
+|---------------|-------------------|
+| Use an agent | `@workspace using @backend, ...` |
+| Use a prompt template | `@workspace using the generate-tests prompt, ...` |
+| Combine both | `@workspace using @tester and the generate-tests prompt, ...` |
+| Use multiple agents | `@workspace using @backend and @security, ...` |
+| Reference a skill | `@workspace referring to the laravel-modules skill, ...` |
+| Reference a rule | `@workspace following the security-best-practices rule, ...` |
 
-1. Create the markdown file in `.ai/skills/` or `.ai/rules/`
-2. Add it to the tables in `AGENTS.md`
-3. Reference it from relevant agent files
+Copilot matches these mentions to the corresponding markdown file names in `.ai/`. The file contents become the instructions that shape the response.
 
-### Adapt for a Different Tech Stack
+---
 
-This system is currently configured for Laravel/PHP projects, but the architecture is stack-agnostic. To adapt:
+## ✏️ Customisation Guide
 
-1. Replace skill files with your stack's patterns (e.g., NestJS, Django, Spring)
-2. Update rule files with your team's mandates
-3. Rewrite agent personas to match your domain expertise
-4. The structure stays the same
+This system is designed to be **forked and extended** by any developer. No code changes, no build steps — just create markdown files.
+
+---
+
+### 🤖 Adding a Custom Sub-Agent
+
+**Step 1:** Create a new file in `.ai/agents/` with the naming convention:
+
+```
+.ai/agents/{name}.agent.md
+```
+
+**Step 2:** Use this template:
+
+```markdown
+# Agent: {Display Name}
+
+> **Role:** {One-line job title and domain}
+> **Use in Copilot Chat:** `@workspace using @{name}, <your request>`
+
+## Persona
+
+Describe who this agent IS. Write in second person ("You are a...").
+Include their mindset, expertise, and how they approach problems.
+Be specific — the more detail, the better Copilot understands the role.
+
+## Responsibilities
+
+- List specific tasks this agent can perform
+- Be concrete: "Write database migrations" not "Help with databases"
+- Each bullet should be actionable
+
+## Constraints
+
+- **Never** {things this agent must never do}
+- **Always** {things this agent must always do}
+- Use bold Never/Always for clarity — LLMs respond well to explicit constraints
+
+## Required Knowledge
+
+Reference the skills and rules this agent should follow.
+These links tell Copilot which files to load as context.
+
+### Skills
+- [Skill Name](.ai/skills/{file}.md) — brief description
+- [Another Skill](.ai/skills/{file}.md) — brief description
+
+### Rules
+- [Rule Name](.ai/rules/{file}.md) — brief description
+- [Another Rule](.ai/rules/{file}.md) — brief description
+
+## Output Expectations
+
+Describe the format and structure of this agent's responses.
+For example: "Return complete, runnable code" or "Use severity-tiered review format."
+```
+
+**Step 3:** Register your agent in [`AGENTS.md`](AGENTS.md) by adding a row to the Agents table:
+
+```markdown
+| **@my-agent** | [my-agent.agent.md](.ai/agents/my-agent.agent.md) | What it specialises in |
+```
+
+**Step 4:** Use it in Copilot Chat:
+
+```
+@workspace using @my-agent, do something
+```
+
+#### Example: Creating a `@devops` Agent
+
+1. Create `.ai/agents/devops.agent.md`:
+
+```markdown
+# Agent: DevOps Engineer
+
+> **Role:** Senior DevOps Engineer & Infrastructure Specialist
+> **Use in Copilot Chat:** `@workspace using @devops, <your request>`
+
+## Persona
+
+You are a Senior DevOps Engineer specialising in CI/CD pipelines,
+Docker, Kubernetes, and cloud infrastructure (AWS/GCP). You automate
+everything and treat infrastructure as code.
+
+## Responsibilities
+
+- Write Dockerfiles and docker-compose configurations
+- Design CI/CD pipelines (GitHub Actions, GitLab CI)
+- Configure monitoring, alerting, and logging
+- Implement infrastructure as code (Terraform, Pulumi)
+
+## Constraints
+
+- **Never** hard-code secrets — always use environment variables or secret managers
+- **Never** run containers as root
+- **Always** include health checks in Docker configurations
+- **Always** use multi-stage builds to minimise image size
+
+## Required Knowledge
+
+### Skills
+- [Git Workflow](.ai/skills/git-workflow.md) — branching and CI triggers
+
+### Rules
+- [Security Best Practices](.ai/rules/security-best-practices.md) — secret management
+
+## Output Expectations
+
+- Provide complete, copy-paste-ready configuration files
+- Include comments explaining non-obvious decisions
+- Specify exact versions for base images and dependencies
+```
+
+2. Add to `AGENTS.md` agents table.
+3. Done. Use it: `@workspace using @devops, write a Dockerfile for this Laravel app`
+
+---
+
+### 📚 Adding a Custom Skill
+
+Skills are **practical guides** that teach how to do something.
+
+**Create:** `.ai/skills/{topic}.md`
+
+**Format:**
+
+```markdown
+# Skill: {Topic Name}
+
+Brief introduction explaining what this skill covers and when to apply it.
+
+## {Section 1}
+
+Practical instructions with code examples...
+
+## {Section 2}
+
+More instructions...
+```
+
+**Then:** Reference it from relevant agent files under `## Required Knowledge > ### Skills`.
+
+---
+
+### 📏 Adding a Custom Rule
+
+Rules are **strict mandates** — violation means rejected code.
+
+**Create:** `.ai/rules/{topic}.md`
+
+**Format:**
+
+```markdown
+# Rule: {Topic Name}
+
+Brief introduction explaining why this rule exists and what it governs.
+
+## {Section 1}
+
+The mandate with code examples showing correct vs incorrect patterns...
+
+## {Section 2}
+
+More mandates...
+```
+
+**Then:** Reference it from relevant agent files under `## Required Knowledge > ### Rules`.
+
+---
+
+### 📝 Adding a Custom Prompt
+
+Prompts are **reusable task templates** for common workflows.
+
+**Create:** `.ai/prompts/{task-name}.prompt.md`
+
+**Format:**
+
+```markdown
+# Prompt: {Task Name}
+
+> **Agent:** [@{agent}](.ai/agents/{agent}.agent.md)
+> **Usage:** `@workspace using @{agent} and this prompt, <request>`
+
+## Objective
+
+What this prompt achieves.
+
+## Instructions
+
+Step-by-step instructions for the AI to follow.
+
+## Output Format
+
+How the response should be structured.
+```
+
+**Usage:** `@workspace using the {task-name} prompt, do something`
+
+---
+
+### 🔄 Adapting for a Different Tech Stack
+
+This system is currently configured for **Laravel/PHP**, but the architecture is stack-agnostic. To adapt for your stack:
+
+| Step | What to do |
+|------|-----------|
+| 1 | Fork this repository |
+| 2 | Replace `.ai/skills/` files with your stack's patterns (e.g., NestJS, Django, Spring Boot) |
+| 3 | Replace `.ai/rules/` files with your team's mandates |
+| 4 | Rewrite agent personas in `.ai/agents/` to match your domain |
+| 5 | Update prompt templates in `.ai/prompts/` for your workflows |
+| 6 | Update `AGENTS.md` to reflect the new content |
+
+The folder structure (`.ai/agents/`, `.ai/skills/`, `.ai/rules/`, `.ai/prompts/`) and the file naming conventions stay the same regardless of tech stack.
+
+---
 
 ## 📄 License
 
