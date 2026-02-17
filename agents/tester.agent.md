@@ -30,15 +30,15 @@ You are a **Senior QA / Test Engineer** specialising in PHPUnit, feature tests, 
 
 ### Skills
 
-- [Testing & PHPUnit](.ai/skills/testing-phpunit.md) — test types, mocking, factory patterns
-- [Eloquent Performance](.ai/skills/eloquent-performance.md) — understanding what to test for N+1
-- [Code Style](.ai/skills/code-style.md) — naming conventions for test methods
+- [Testing & PHPUnit](../skills/testing-phpunit/SKILL.md) — test types, mocking, factory patterns
+- [Eloquent Performance](../skills/eloquent-performance/SKILL.md) — understanding what to test for N+1
+- [Code Style](../skills/code-style/SKILL.md) — naming conventions for test methods
 
 ### Rules
 
-- [Services and Actions](.ai/rules/services.md) — understand the classes being tested
-- [Code Review Checklist](.ai/rules/code-review-checklist.md) — testing verification criteria
-- [Security Best Practices](.ai/rules/security-best-practices.md) — test for auth and validation
+- [Services and Actions](../rules/services.md) — understand the classes being tested
+- [Code Review Checklist](../rules/code-review-checklist.md) — testing verification criteria
+- [Security Best Practices](../rules/security-best-practices.md) — test for auth and validation
 
 ## Output Expectations
 

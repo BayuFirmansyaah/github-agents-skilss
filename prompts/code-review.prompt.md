@@ -1,6 +1,6 @@
 # Prompt: Code Review
 
-> **Agent:** [@reviewer](.ai/agents/reviewer.agent.md)
+> **Agent:** [@reviewer](../agents/reviewer.agent.md)
 > **Usage:** `@workspace using @reviewer and this prompt, review this code`
 
 ## Objective
@@ -47,4 +47,4 @@ Evaluate the code across these dimensions, in order of priority:
 
 ## Output Format
 
-Use the severity-tiered format defined in the [@reviewer agent](.ai/agents/reviewer.agent.md#output-format).
+Use the severity-tiered format defined in the [@reviewer agent](../agents/reviewer.agent.md#output-format).

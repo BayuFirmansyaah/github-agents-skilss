@@ -1,6 +1,6 @@
 # Prompt: Refactor
 
-> **Agent:** [@backend](.ai/agents/backend.agent.md) or [@reviewer](.ai/agents/reviewer.agent.md)
+> **Agent:** [@backend](../agents/backend.agent.md) or [@reviewer](../agents/reviewer.agent.md)
 > **Usage:** `@workspace using @backend and this prompt, refactor this code`
 
 ## Objective

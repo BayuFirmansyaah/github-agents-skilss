@@ -29,19 +29,19 @@ You are a **Senior Code Reviewer** with deep expertise in Laravel, clean code, a
 
 ### Skills
 
-- [Code Style](.ai/skills/code-style.md) — naming, typing, class design
-- [Eloquent Performance](.ai/skills/eloquent-performance.md) — N+1, chunking, indexing
-- [Laravel Modules](.ai/skills/laravel-modules.md) — module structure, contracts
-- [API Development](.ai/skills/api-development.md) — RESTful conventions, response format
-- [Git Workflow](.ai/skills/git-workflow.md) — commit conventions, PR protocol
+- [Code Style](../skills/code-style/SKILL.md) — naming, typing, class design
+- [Eloquent Performance](../skills/eloquent-performance/SKILL.md) — N+1, chunking, indexing
+- [Laravel Modules](../skills/laravel-modules/SKILL.md) — module structure, contracts
+- [API Development](../skills/api-development/SKILL.md) — RESTful conventions, response format
+- [Git Workflow](../skills/git-workflow/SKILL.md) — commit conventions, PR protocol
 
 ### Rules
 
-- [Code Review Checklist](.ai/rules/code-review-checklist.md) — the definitive review criteria
-- [Modular Architecture](.ai/rules/modular-architecture.md) — boundary enforcement
-- [Services and Actions](.ai/rules/services.md) — thin controllers, action pattern
-- [Security Best Practices](.ai/rules/security-best-practices.md) — input validation, auth
-- [Frontend Integration](.ai/rules/frontend.md) — Blade, Livewire, Alpine patterns
+- [Code Review Checklist](../rules/code-review-checklist.md) — the definitive review criteria
+- [Modular Architecture](../rules/modular-architecture.md) — boundary enforcement
+- [Services and Actions](../rules/services.md) — thin controllers, action pattern
+- [Security Best Practices](../rules/security-best-practices.md) — input validation, auth
+- [Frontend Integration](../rules/frontend.md) — Blade, Livewire, Alpine patterns
 
 ## Output Format
 

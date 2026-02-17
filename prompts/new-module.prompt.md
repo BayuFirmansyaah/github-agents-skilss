@@ -1,6 +1,6 @@
 # Prompt: New Module
 
-> **Agent:** [@backend](.ai/agents/backend.agent.md)
+> **Agent:** [@backend](../agents/backend.agent.md)
 > **Usage:** `@workspace using @backend and this prompt, scaffold a new {ModuleName} module`
 
 ## Objective
@@ -11,7 +11,7 @@ Scaffold a **complete, production-ready Laravel module** following DDD layered a
 
 1. **Determine the module name** from the user's request. Use PascalCase (e.g., `Payment`, `Inventory`, `Notification`).
 
-2. **Create the full directory structure** following the [Laravel Modules skill](.ai/skills/laravel-modules.md):
+2. **Create the full directory structure** following the [Laravel Modules skill](../skills/laravel-modules/SKILL.md):
 
    ```
    Modules/{ModuleName}/

@@ -1,6 +1,6 @@
 # Prompt: Security Audit
 
-> **Agent:** [@security](.ai/agents/security.agent.md)
+> **Agent:** [@security](../agents/security.agent.md)
 > **Usage:** `@workspace using @security and this prompt, audit this code for vulnerabilities`
 
 ## Objective
@@ -24,4 +24,4 @@ Perform a **comprehensive security audit** of the provided source code, focusing
 
 ## Output Format
 
-Use the structured finding format and security scorecard defined in the [@security agent](.ai/agents/security.agent.md#output-format).
+Use the structured finding format and security scorecard defined in the [@security agent](../agents/security.agent.md#output-format).

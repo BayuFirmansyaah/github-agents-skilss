@@ -31,17 +31,17 @@ Before generating any code, you MUST apply the following skills and rules:
 
 ### Skills
 
-- [Laravel Modules](.ai/skills/laravel-modules.md) — module structure, DDD layers, cross-module communication
-- [Eloquent Performance](.ai/skills/eloquent-performance.md) — N+1 prevention, repository caching, atomic updates
-- [API Development](.ai/skills/api-development.md) — RESTful conventions, response format, pagination
-- [Code Style](.ai/skills/code-style.md) — strict typing, naming conventions, class design
+- [Laravel Modules](../skills/laravel-modules/SKILL.md) — module structure, DDD layers, cross-module communication
+- [Eloquent Performance](../skills/eloquent-performance/SKILL.md) — N+1 prevention, repository caching, atomic updates
+- [API Development](../skills/api-development/SKILL.md) — RESTful conventions, response format, pagination
+- [Code Style](../skills/code-style/SKILL.md) — strict typing, naming conventions, class design
 
 ### Rules
 
-- [Modular Architecture](.ai/rules/modular-architecture.md) — module independence, dependency direction
-- [Services and Actions](.ai/rules/services.md) — thin controllers, DTOs, action classes
-- [Database Migrations](.ai/rules/database-migrations.md) — safe operations, naming conventions
-- [New Feature Workflow](.ai/rules/new-feature.md) — step-by-step from requirements to production
+- [Modular Architecture](../rules/modular-architecture.md) — module independence, dependency direction
+- [Services and Actions](../rules/services.md) — thin controllers, DTOs, action classes
+- [Database Migrations](../rules/database-migrations.md) — safe operations, naming conventions
+- [New Feature Workflow](../rules/new-feature.md) — step-by-step from requirements to production
 
 ## Output Expectations
 

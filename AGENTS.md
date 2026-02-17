@@ -13,37 +13,24 @@ This repository is a **prompt-first, markdown-driven AI knowledge base** designe
 ### Architecture
 
 ```
-.vscode/prompts/  → Slash command entry points (loaded by Copilot automatically)
-.ai/agents/       → Personas with responsibilities, constraints, and cross-references
-.ai/skills/       → Practical how-to guides and technical knowledge
-.ai/rules/        → Strict mandates that must never be violated
-.ai/prompts/      → Reusable task templates for common workflows
+agents/       → Personas with responsibilities, constraints, and cross-references
+skills/       → Practical how-to guides and technical knowledge
+rules/        → Strict mandates that must never be violated
+prompts/      → Reusable task templates for common workflows
 ```
 
-### How to Use — Slash Commands (Recommended)
+### How to Use
 
-Each file in `.vscode/prompts/` becomes a native Copilot Chat slash command. Just type `/` in Copilot Chat:
+Reference the knowledge base via `@workspace` in Copilot Chat:
 
-| Command | Agent | What it does |
-|---------|-------|-------------|
-| `/backend` | @backend | Laravel backend engineering, DDD module design |
-| `/tester` | @tester | PHPUnit test development, TDD |
-| `/review` | @reviewer | Structured code review with severity tiers |
-| `/security` | @security | OWASP security audit with vulnerability classification |
-| `/generate-tests` | @tester | Generate comprehensive tests for the current file |
-| `/new-module` | @backend | Scaffold a full DDD Laravel module |
-| `/refactor` | @backend | Refactor code for clean architecture |
-
-Each slash command automatically loads the correct agent persona, skills, and rules via `#file:` references.
-
-### How to Use — @workspace (Alternative)
-
-You can also reference the knowledge base directly via `@workspace`:
-
-```
-@workspace using @backend, implement a new Payment module
-@workspace using @tester and the generate-tests prompt, write tests for this file
-```
+| What you want | How to mention it |
+|---------------|-------------------|
+| Use an agent | `@workspace using @backend, ...` |
+| Use a prompt template | `@workspace using the generate-tests prompt, ...` |
+| Combine both | `@workspace using @tester and the generate-tests prompt, ...` |
+| Use multiple agents | `@workspace using @backend and @security, ...` |
+| Reference a skill | `@workspace referring to the laravel-modules skill, ...` |
+| Reference a rule | `@workspace following the security-best-practices rule, ...` |
 
 ---
 
@@ -58,10 +45,10 @@ Each agent is a markdown file that defines a persona, responsibilities, constrai
 
 | Agent | File | Specialisation |
 |-------|------|---------------|
-| **@backend** | [backend.agent.md](.ai/agents/backend.agent.md) | Laravel, DDD, modular architecture, API design |
-| **@tester** | [tester.agent.md](.ai/agents/tester.agent.md) | PHPUnit, TDD, test factories, coverage analysis |
-| **@reviewer** | [reviewer.agent.md](.ai/agents/reviewer.agent.md) | Code review, quality gates, severity classification |
-| **@security** | [security.agent.md](.ai/agents/security.agent.md) | OWASP Top 10, vulnerability auditing, secure coding |
+| **@backend** | [backend.agent.md](agents/backend.agent.md) | Laravel, DDD, modular architecture, API design |
+| **@tester** | [tester.agent.md](agents/tester.agent.md) | PHPUnit, TDD, test factories, coverage analysis |
+| **@reviewer** | [reviewer.agent.md](agents/reviewer.agent.md) | Code review, quality gates, severity classification |
+| **@security** | [security.agent.md](agents/security.agent.md) | OWASP Top 10, vulnerability auditing, secure coding |
 
 ---
 
@@ -71,12 +58,12 @@ Skills are practical, how-to guides that teach techniques and patterns. Agents r
 
 | Skill | File | Topics |
 |-------|------|--------|
-| Laravel Modules | [laravel-modules.md](.ai/skills/laravel-modules.md) | Module structure, DDD layers, cross-module communication, Saga Pattern |
-| Eloquent Performance | [eloquent-performance.md](.ai/skills/eloquent-performance.md) | N+1 prevention, chunking, caching, atomic updates, indexing |
-| API Development | [api-development.md](.ai/skills/api-development.md) | RESTful conventions, response format, versioning, pagination |
-| Testing & PHPUnit | [testing-phpunit.md](.ai/skills/testing-phpunit.md) | Test types, mocking, factories, data providers |
-| Git Workflow | [git-workflow.md](.ai/skills/git-workflow.md) | Branching, conventional commits, PR protocol |
-| Code Style | [code-style.md](.ai/skills/code-style.md) | Strict types, naming, class design, static analysis |
+| Laravel Modules | [SKILL.md](skills/laravel-modules/SKILL.md) | Module structure, DDD layers, cross-module communication, Saga Pattern |
+| Eloquent Performance | [SKILL.md](skills/eloquent-performance/SKILL.md) | N+1 prevention, chunking, caching, atomic updates, indexing |
+| API Development | [SKILL.md](skills/api-development/SKILL.md) | RESTful conventions, response format, versioning, pagination |
+| Testing & PHPUnit | [SKILL.md](skills/testing-phpunit/SKILL.md) | Test types, mocking, factories, data providers |
+| Git Workflow | [SKILL.md](skills/git-workflow/SKILL.md) | Branching, conventional commits, PR protocol |
+| Code Style | [SKILL.md](skills/code-style/SKILL.md) | Strict types, naming, class design, static analysis |
 
 ---
 
@@ -86,14 +73,14 @@ Rules are strict mandates. Violating any rule is unacceptable — code that brea
 
 | Rule | File | Governs |
 |------|------|---------|
-| Modular Architecture | [modular-architecture.md](.ai/rules/modular-architecture.md) | Module independence, boundary enforcement |
-| Services & Actions | [services.md](.ai/rules/services.md) | Thin controllers, DTOs, dependency injection |
-| Security | [security-best-practices.md](.ai/rules/security-best-practices.md) | Input validation, auth, XSS, SQL injection |
-| Database Migrations | [database-migrations.md](.ai/rules/database-migrations.md) | Safe operations, naming, down methods |
-| New Feature Workflow | [new-feature.md](.ai/rules/new-feature.md) | Step-by-step from requirements to production |
-| Frontend Integration | [frontend.md](.ai/rules/frontend.md) | Blade, Tailwind, AlpineJS, accessibility |
-| Livewire Components | [livewire-components.md](.ai/rules/livewire-components.md) | SRP, properties, events, performance |
-| Code Review Checklist | [code-review-checklist.md](.ai/rules/code-review-checklist.md) | Pre-PR verification across all dimensions |
+| Modular Architecture | [modular-architecture.md](rules/modular-architecture.md) | Module independence, boundary enforcement |
+| Services & Actions | [services.md](rules/services.md) | Thin controllers, DTOs, dependency injection |
+| Security | [security-best-practices.md](rules/security-best-practices.md) | Input validation, auth, XSS, SQL injection |
+| Database Migrations | [database-migrations.md](rules/database-migrations.md) | Safe operations, naming, down methods |
+| New Feature Workflow | [new-feature.md](rules/new-feature.md) | Step-by-step from requirements to production |
+| Frontend Integration | [frontend.md](rules/frontend.md) | Blade, Tailwind, AlpineJS, accessibility |
+| Livewire Components | [livewire-components.md](rules/livewire-components.md) | SRP, properties, events, performance |
+| Code Review Checklist | [code-review-checklist.md](rules/code-review-checklist.md) | Pre-PR verification across all dimensions |
 
 ---
 
@@ -103,11 +90,11 @@ Reusable task templates that provide structured instructions for common workflow
 
 | Prompt | File | Purpose |
 |--------|------|---------|
-| Generate Tests | [generate-tests.prompt.md](.ai/prompts/generate-tests.prompt.md) | Comprehensive PHPUnit test generation |
-| Code Review | [code-review.prompt.md](.ai/prompts/code-review.prompt.md) | Structured, severity-tiered review |
-| New Module | [new-module.prompt.md](.ai/prompts/new-module.prompt.md) | Scaffold a DDD Laravel module |
-| Security Audit | [security-audit.prompt.md](.ai/prompts/security-audit.prompt.md) | OWASP-aligned vulnerability assessment |
-| Refactor | [refactor.prompt.md](.ai/prompts/refactor.prompt.md) | Clean architecture refactoring |
+| Generate Tests | [generate-tests.prompt.md](prompts/generate-tests.prompt.md) | Comprehensive PHPUnit test generation |
+| Code Review | [code-review.prompt.md](prompts/code-review.prompt.md) | Structured, severity-tiered review |
+| New Module | [new-module.prompt.md](prompts/new-module.prompt.md) | Scaffold a DDD Laravel module |
+| Security Audit | [security-audit.prompt.md](prompts/security-audit.prompt.md) | OWASP-aligned vulnerability assessment |
+| Refactor | [refactor.prompt.md](prompts/refactor.prompt.md) | Clean architecture refactoring |
 
 ---
 
@@ -125,7 +112,7 @@ These three principles govern all agent behaviour:
 
 ## Creating New Agents
 
-To add a new agent, create a markdown file in `.ai/agents/` following this template:
+To add a new agent, create a markdown file in `agents/` following this template:
 
 ```markdown
 # Agent: {Name}
@@ -144,9 +131,9 @@ To add a new agent, create a markdown file in `.ai/agents/` following this templ
 
 ## Required Knowledge
 ### Skills
-- [Skill Name](.ai/skills/{file}.md)
+- [Skill Name](skills/{topic}/SKILL.md)
 ### Rules
-- [Rule Name](.ai/rules/{file}.md)
+- [Rule Name](rules/{file}.md)
 
 ## Output Expectations
 (How this agent should format its responses)

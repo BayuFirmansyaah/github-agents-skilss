@@ -1,6 +1,6 @@
 # Prompt: Generate Tests
 
-> **Agent:** [@tester](.ai/agents/tester.agent.md)
+> **Agent:** [@tester](../agents/tester.agent.md)
 > **Usage:** `@workspace using @tester and this prompt, generate tests for the active file`
 
 ## Objective

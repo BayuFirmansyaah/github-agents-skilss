@@ -31,15 +31,15 @@ You are a **Senior Security Engineer** specialising in application security, OWA
 
 ### Skills
 
-- [API Development](.ai/skills/api-development.md) — endpoint security, authentication
-- [Eloquent Performance](.ai/skills/eloquent-performance.md) — safe query patterns
-- [Code Style](.ai/skills/code-style.md) — strict typing to prevent type juggling attacks
+- [API Development](../skills/api-development/SKILL.md) — endpoint security, authentication
+- [Eloquent Performance](../skills/eloquent-performance/SKILL.md) — safe query patterns
+- [Code Style](../skills/code-style/SKILL.md) — strict typing to prevent type juggling attacks
 
 ### Rules
 
-- [Security Best Practices](.ai/rules/security-best-practices.md) — the definitive security mandate
-- [Services and Actions](.ai/rules/services.md) — input validation flow
-- [Code Review Checklist](.ai/rules/code-review-checklist.md) — security verification criteria
+- [Security Best Practices](../rules/security-best-practices.md) — the definitive security mandate
+- [Services and Actions](../rules/services.md) — input validation flow
+- [Code Review Checklist](../rules/code-review-checklist.md) — security verification criteria
 
 ## Output Format
 

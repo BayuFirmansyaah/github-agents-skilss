@@ -1,151 +1,163 @@
-# 🤖 AI Dev Assistant — Markdown Agent System
+# 🤖 GitHub Agents & Skills
 
-A **zero-build, prompt-first AI knowledge base** that transforms GitHub Copilot Chat into a team of specialized AI agents. No extension, no compilation, no installation — just clone, open, and use.
+A **zero-build, prompt-first AI knowledge base** that transforms GitHub Copilot Chat into a team of specialized AI agents. No extension, no compilation — just clone into your project and start using.
 
 ## ✨ What This Is
 
-This repository is a collection of markdown files that define **AI agent personas**, **skills**, **rules**, and **reusable prompt templates**. When used with GitHub Copilot Chat's `@workspace` feature, these files automatically become the context that shapes Copilot's responses.
+This repository is a collection of markdown files that define **AI agent personas**, **skills**, **rules**, and **reusable prompt templates** for GitHub Copilot Chat. When cloned as `.github` into your project, these files become the context that shapes Copilot's responses via `@workspace`.
 
 **Think of it as an AI team you can clone.**
 
-| Agent | Specialisation | Slash Command |
-|-------|---------------|---------------|
-| 🏗️ **@backend** | Laravel, DDD, modular architecture | `/backend` |
-| 🧪 **@tester** | PHPUnit, TDD, test coverage | `/tester` |
-| 🔍 **@reviewer** | Code review, quality gates | `/review` |
-| 🛡️ **@security** | OWASP Top 10, vulnerability auditing | `/security` |
+| Agent | Specialisation |
+|-------|----------------|
+| 🏗️ **@backend** | Laravel, DDD, modular architecture |
+| 🧪 **@tester** | PHPUnit, TDD, test coverage |
+| 🔍 **@reviewer** | Code review, quality gates |
+| 🛡️ **@security** | OWASP Top 10, vulnerability auditing |
 
-Plus task-specific commands: `/generate-tests`, `/new-module`, `/refactor`
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- [VS Code](https://code.visualstudio.com/)
-- [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot) extension
-- [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) extension
-
-### Setup
-
-```bash
-git clone https://github.com/your-org/github-agents-skills.git
-code github-agents-skills
-```
-
-That's it. No `npm install`. No build step. Just open VS Code and start chatting.
-
-### Usage
-
-Open Copilot Chat (`Ctrl+Shift+I`) and type a slash command:
-
-```
-/backend implement a new Payment module
-```
-
-```
-/tester generate PHPUnit tests for the active file
-```
-
-```
-/review review this code
-```
-
-```
-/security audit this file for vulnerabilities
-```
-
-Or use task-specific commands:
-
-```
-/generate-tests
-/new-module Payment
-/refactor
-```
-
-> **Alternative:** You can also use `@workspace` mentions:
-> `@workspace using @backend, implement a new Payment module`
+---
 
 ## 📁 Repository Structure
 
 ```
 .
 ├── AGENTS.md                          # Root orchestrator — Copilot reads this first
+├── README.md                          # This file
 │
-├── .vscode/prompts/                   # ⚡ Slash command entry points
-│   ├── backend.prompt.md              # /backend
-│   ├── tester.prompt.md               # /tester
-│   ├── review.prompt.md               # /review
-│   ├── security.prompt.md             # /security
-│   ├── generate-tests.prompt.md       # /generate-tests
-│   ├── new-module.prompt.md           # /new-module
-│   └── refactor.prompt.md             # /refactor
+├── agents/                            # Agent persona definitions
+│   ├── backend.agent.md               # Senior Backend Engineer
+│   ├── tester.agent.md                # QA / Test Engineer
+│   ├── reviewer.agent.md              # Code Reviewer
+│   └── security.agent.md              # Security Auditor
 │
-├── .ai/
-│   ├── agents/                        # Agent personas
-│   │   ├── backend.agent.md           # Senior Backend Engineer
-│   │   ├── tester.agent.md            # QA / Test Engineer
-│   │   ├── reviewer.agent.md          # Code Reviewer
-│   │   └── security.agent.md          # Security Auditor
-│   │
-│   ├── skills/                        # How-to guides & knowledge
-│   │   ├── laravel-modules.md         # Module structure & DDD
-│   │   ├── eloquent-performance.md    # Query optimization
-│   │   ├── api-development.md         # RESTful API patterns
-│   │   ├── testing-phpunit.md         # PHPUnit & TDD
-│   │   ├── git-workflow.md            # Branching & commits
-│   │   └── code-style.md             # Naming & type safety
-│   │
-│   ├── rules/                         # Strict mandates
-│   │   ├── modular-architecture.md    # Module boundaries
-│   │   ├── services.md               # Actions & DTOs
-│   │   ├── security-best-practices.md # Input validation & auth
-│   │   ├── database-migrations.md     # Safe migrations
-│   │   ├── new-feature.md            # Feature workflow
-│   │   ├── frontend.md               # Blade & Alpine
-│   │   ├── livewire-components.md     # Livewire patterns
-│   │   └── code-review-checklist.md   # Review criteria
-│   │
-│   └── prompts/                       # Reusable task templates
-│       ├── generate-tests.prompt.md   # Test generation
-│       ├── code-review.prompt.md      # Structured review
-│       ├── new-module.prompt.md       # Module scaffolding
-│       ├── security-audit.prompt.md   # Vulnerability audit
-│       └── refactor.prompt.md         # Code refactoring
+├── prompts/                           # Reusable task prompt templates
+│   ├── code-review.prompt.md          # Structured code review
+│   ├── generate-tests.prompt.md       # PHPUnit test generation
+│   ├── new-module.prompt.md           # DDD module scaffolding
+│   ├── refactor.prompt.md             # Code refactoring
+│   └── security-audit.prompt.md       # OWASP vulnerability audit
 │
-└── README.md
+├── skills/                            # Practical how-to guides & knowledge
+│   ├── api-development/
+│   │   └── SKILL.md                   # RESTful API patterns
+│   ├── code-style/
+│   │   └── SKILL.md                   # Naming & type safety
+│   ├── eloquent-performance/
+│   │   └── SKILL.md                   # Query optimization
+│   ├── git-workflow/
+│   │   └── SKILL.md                   # Branching & commits
+│   ├── laravel-modules/
+│   │   └── SKILL.md                   # Module structure & DDD
+│   └── testing-phpunit/
+│       └── SKILL.md                   # PHPUnit & TDD
+│
+└── rules/                             # Strict coding mandates
+    ├── code-review-checklist.md        # Review criteria
+    ├── database-migrations.md          # Safe migrations
+    ├── frontend.md                     # Blade & Alpine
+    ├── livewire-components.md          # Livewire patterns
+    ├── modular-architecture.md         # Module boundaries
+    ├── new-feature.md                  # Feature workflow
+    ├── security-best-practices.md      # Input validation & auth
+    └── services.md                     # Actions & DTOs
 ```
 
-## 🛠 How It Works
+---
+
+## 🚀 Installation
+
+### Prerequisites
+
+- [VS Code](https://code.visualstudio.com/) (or any editor with GitHub Copilot Chat support)
+- [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot) extension
+- [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) extension
+
+### Setup
+
+Clone this repository **as `.github`** into the root of your existing project:
+
+```bash
+cd your-project
+git clone https://github.com/<your-org>/github-agents-skilss.git .github
+```
+
+> **Why `.github`?** GitHub Copilot Chat automatically scans the workspace for markdown files. By placing agents, prompts, skills, and rules inside `.github/`, they become part of your project's workspace context without cluttering your source tree.
+
+After cloning, your project will look like:
 
 ```
-User types: /backend implement Payment module
-               │
-               ▼
-┌─ .vscode/prompts/backend.prompt.md ─┐
-│  Copilot loads this prompt file     │
-│  #file: references pull in:        │
-│    → .ai/agents/backend.agent.md   │
-│    → .ai/skills/laravel-modules.md │
-│    → .ai/skills/eloquent-perf.md   │
-│    → .ai/rules/modular-arch.md     │
-│    → .ai/rules/services.md         │
-│  All combined into one context     │
-│  Copilot adopts persona + rules    │
-│  Generates specialized response    │
-└─────────────────────────────────────┘
+your-project/
+├── .github/
+│   ├── AGENTS.md
+│   ├── agents/
+│   ├── prompts/
+│   ├── skills/
+│   └── rules/
+├── app/
+├── src/
+└── ...
 ```
 
-1. `.vscode/prompts/*.md` files register as **native slash commands** in Copilot Chat
-2. Each prompt file uses `#file:` references to pull in **agent + skills + rules**
-3. Copilot automatically resolves all `#file:` references and loads the full context
-4. The agent **persona**, **skills**, and **rules** shape the response
-5. No build, no runtime, no extension — just markdown composition
+That's it. No `npm install`. No build step. Just open VS Code and start chatting with Copilot.
 
-## 💬 How Mentions Work
+> **💡 Tip:** If you want to keep this repo as a Git submodule (so you can pull updates), use:
+> ```bash
+> git submodule add https://github.com/<your-org>/github-agents-skilss.git .github
+> ```
 
-Every file in `.ai/` is part of the workspace knowledge that Copilot Chat can read. When you type `@workspace`, Copilot scans the repository and uses the markdown files as context.
+---
 
-To invoke a specific agent or prompt, **mention it by name** in your message:
+## 💬 Usage
+
+Open Copilot Chat (`Ctrl+Shift+I` / `Cmd+Shift+I`) and use `@workspace` to invoke agents:
+
+### Using Agents
+
+```
+@workspace using @backend, implement a new Payment module
+```
+
+```
+@workspace using @tester, generate PHPUnit tests for the active file
+```
+
+```
+@workspace using @reviewer, review this code
+```
+
+```
+@workspace using @security, audit this file for vulnerabilities
+```
+
+### Using Prompt Templates
+
+```
+@workspace using @tester and the generate-tests prompt, write tests for this file
+```
+
+```
+@workspace using @backend and the new-module prompt, scaffold a Payment module
+```
+
+### Combining Agents
+
+```
+@workspace using @backend and @security, implement a secure Payment module
+```
+
+### Referencing Skills & Rules
+
+```
+@workspace referring to the laravel-modules skill, explain module structure
+```
+
+```
+@workspace following the security-best-practices rule, review this controller
+```
+
+### How Mentions Work
+
+Every markdown file in the workspace is knowledge that Copilot Chat can read. When you type `@workspace`, Copilot scans the repository and uses the markdown files as context.
 
 | What you want | How to mention it |
 |---------------|-------------------|
@@ -156,22 +168,92 @@ To invoke a specific agent or prompt, **mention it by name** in your message:
 | Reference a skill | `@workspace referring to the laravel-modules skill, ...` |
 | Reference a rule | `@workspace following the security-best-practices rule, ...` |
 
-Copilot matches these mentions to the corresponding markdown file names in `.ai/`. The file contents become the instructions that shape the response.
-
 ---
 
-## ✏️ Customisation Guide
-
-This system is designed to be **forked and extended** by any developer. No code changes, no build steps — just create markdown files.
-
----
-
-### 🤖 Adding a Custom Sub-Agent
-
-**Step 1:** Create a new file in `.ai/agents/` with the naming convention:
+## 🛠 How It Works
 
 ```
-.ai/agents/{name}.agent.md
+User types: @workspace using @backend, implement Payment module
+               │
+               ▼
+┌─ Copilot scans workspace ────────────┐
+│  Finds AGENTS.md (root orchestrator) │
+│  Loads referenced files:             │
+│    → agents/backend.agent.md         │
+│    → skills/laravel-modules/SKILL.md │
+│    → skills/eloquent-performance/    │
+│    → rules/modular-architecture.md   │
+│    → rules/services.md              │
+│  All combined into one context       │
+│  Copilot adopts persona + rules      │
+│  Generates specialized response      │
+└──────────────────────────────────────┘
+```
+
+1. `AGENTS.md` is the root orchestrator — Copilot reads it first
+2. Agent files reference **skills** and **rules** via markdown links
+3. Copilot resolves all references and loads the full context
+4. The agent **persona**, **skills**, and **rules** shape the response
+5. No build, no runtime, no extension — just markdown composition
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! You can contribute new **prompts**, **agents**, **skills**, or **rules**.
+
+### Adding a Custom Prompt
+
+Prompts are **reusable task templates** for common workflows.
+
+**Step 1:** Create a new file in `prompts/`:
+
+```
+prompts/{task-name}.prompt.md
+```
+
+**Step 2:** Use this template:
+
+```markdown
+# Prompt: {Task Name}
+
+> **Agent:** [@{agent-name}](agents/{agent-name}.agent.md)
+> **Usage:** `@workspace using @{agent-name} and this prompt, <your request>`
+
+## Objective
+
+What this prompt achieves. Be specific about the end goal.
+
+## Instructions
+
+Step-by-step instructions for the AI to follow.
+
+1. First, analyze the provided code / context
+2. Then, perform the specific task
+3. Finally, output the result
+
+## Output Format
+
+How the response should be structured.
+Use tables, code blocks, and headers as needed.
+```
+
+**Step 3:** Test your prompt by using it in Copilot Chat:
+
+```
+@workspace using the {task-name} prompt, <your request>
+```
+
+---
+
+### Adding a Custom Agent
+
+Agents are **specialized personas** with defined expertise and constraints.
+
+**Step 1:** Create a new file in `agents/`:
+
+```
+agents/{name}.agent.md
 ```
 
 **Step 2:** Use this template:
@@ -186,158 +268,45 @@ This system is designed to be **forked and extended** by any developer. No code 
 
 Describe who this agent IS. Write in second person ("You are a...").
 Include their mindset, expertise, and how they approach problems.
-Be specific — the more detail, the better Copilot understands the role.
 
 ## Responsibilities
 
 - List specific tasks this agent can perform
 - Be concrete: "Write database migrations" not "Help with databases"
-- Each bullet should be actionable
 
 ## Constraints
 
 - **Never** {things this agent must never do}
 - **Always** {things this agent must always do}
-- Use bold Never/Always for clarity — LLMs respond well to explicit constraints
 
 ## Required Knowledge
 
-Reference the skills and rules this agent should follow.
-These links tell Copilot which files to load as context.
-
 ### Skills
-- [Skill Name](.ai/skills/{file}.md) — brief description
-- [Another Skill](.ai/skills/{file}.md) — brief description
+- [Skill Name](skills/{topic}/SKILL.md) — brief description
 
 ### Rules
-- [Rule Name](.ai/rules/{file}.md) — brief description
-- [Another Rule](.ai/rules/{file}.md) — brief description
+- [Rule Name](rules/{file}.md) — brief description
 
 ## Output Expectations
 
 Describe the format and structure of this agent's responses.
-For example: "Return complete, runnable code" or "Use severity-tiered review format."
 ```
 
-**Step 3:** Register your agent in [`AGENTS.md`](AGENTS.md) by adding a row to the Agents table:
-
-```markdown
-| **@my-agent** | [my-agent.agent.md](.ai/agents/my-agent.agent.md) | What it specialises in |
-```
-
-**Step 4:** Create a slash command for it in `.vscode/prompts/devops.prompt.md` (see below).
-
-**Step 5:** Use it: `/devops write a Dockerfile for this Laravel app`
-
-#### Example: Creating a `@devops` Agent
-
-1. Create `.ai/agents/devops.agent.md`:
-
-```markdown
-# Agent: DevOps Engineer
-
-> **Role:** Senior DevOps Engineer & Infrastructure Specialist
-> **Use in Copilot Chat:** `/devops <your request>`
-
-## Persona
-
-You are a Senior DevOps Engineer specialising in CI/CD pipelines,
-Docker, Kubernetes, and cloud infrastructure (AWS/GCP). You automate
-everything and treat infrastructure as code.
-
-## Responsibilities
-
-- Write Dockerfiles and docker-compose configurations
-- Design CI/CD pipelines (GitHub Actions, GitLab CI)
-- Configure monitoring, alerting, and logging
-- Implement infrastructure as code (Terraform, Pulumi)
-
-## Constraints
-
-- **Never** hard-code secrets — always use environment variables or secret managers
-- **Never** run containers as root
-- **Always** include health checks in Docker configurations
-- **Always** use multi-stage builds to minimise image size
-
-## Required Knowledge
-
-### Skills
-- [Git Workflow](.ai/skills/git-workflow.md) — branching and CI triggers
-
-### Rules
-- [Security Best Practices](.ai/rules/security-best-practices.md) — secret management
-
-## Output Expectations
-
-- Provide complete, copy-paste-ready configuration files
-- Include comments explaining non-obvious decisions
-- Specify exact versions for base images and dependencies
-```
-
-2. Create `.vscode/prompts/devops.prompt.md` (see next section).
-3. Add to `AGENTS.md` agents table.
-4. Done. Use it: `/devops write a Dockerfile for this Laravel app`
+**Step 3:** Register your agent in [`AGENTS.md`](AGENTS.md) by adding a row to the Agents table.
 
 ---
 
-### ⚡ Adding a Custom Slash Command
+### Adding a Custom Skill
 
-Every `.md` file in `.vscode/prompts/` becomes a native slash command automatically.
+Skills are **practical guides** that teach how to do something. Each skill lives in its own folder.
 
-**Step 1:** Create a new file:
+**Step 1:** Create a new folder and `SKILL.md` file:
 
 ```
-.vscode/prompts/{command-name}.prompt.md
+skills/{topic}/SKILL.md
 ```
-
-The filename becomes the command name: `devops.prompt.md` → `/devops`
 
 **Step 2:** Use this template:
-
-```markdown
----
-mode: 'agent'
-description: '{Short description shown in Copilot command list}'
----
-
-You are the **@{agent-name}** agent. Read and adopt the full persona below.
-
-# Agent Definition
-
-#file:../../.ai/agents/{agent-name}.agent.md
-
-# Required Skills
-
-#file:../../.ai/skills/{skill-1}.md
-#file:../../.ai/skills/{skill-2}.md
-
-# Required Rules
-
-#file:../../.ai/rules/{rule-1}.md
-#file:../../.ai/rules/{rule-2}.md
-
-# Instructions
-
-1. Adopt the @{agent-name} persona completely
-2. Apply ALL referenced skills as practical knowledge
-3. Enforce ALL referenced rules as non-negotiable constraints
-4. {Specific output instructions for this command}
-```
-
-> **Key:** The `#file:` syntax tells Copilot to load the referenced file as context.
-> Paths are relative to the prompt file location (`.vscode/prompts/`).
-
-**Step 3:** The command is immediately available in Copilot Chat — just type `/` and your command name.
-
----
-
-### 📚 Adding a Custom Skill
-
-Skills are **practical guides** that teach how to do something.
-
-**Create:** `.ai/skills/{topic}.md`
-
-**Format:**
 
 ```markdown
 # Skill: {Topic Name}
@@ -353,17 +322,17 @@ Practical instructions with code examples...
 More instructions...
 ```
 
+> **💡 Tip:** You can add additional files inside the skill folder (e.g., `examples/`, `scripts/`) for more complex skills that need supporting resources.
+
 **Then:** Reference it from relevant agent files under `## Required Knowledge > ### Skills`.
 
 ---
 
-### 📏 Adding a Custom Rule
+### Adding a Custom Rule
 
 Rules are **strict mandates** — violation means rejected code.
 
-**Create:** `.ai/rules/{topic}.md`
-
-**Format:**
+**Create:** `rules/{topic}.md`
 
 ```markdown
 # Rule: {Topic Name}
@@ -383,34 +352,22 @@ More mandates...
 
 ---
 
-### 📝 Adding a Custom Prompt
+### Contribution Workflow
 
-Prompts are **reusable task templates** for common workflows.
+1. **Fork** this repository
+2. **Create a branch** for your changes: `git checkout -b feat/add-devops-agent`
+3. **Add your files** following the templates and naming conventions above
+4. **Test your changes** by cloning into a project's `.github/` and verifying with Copilot Chat
+5. **Submit a Pull Request** with a clear description of what you added and why
 
-**Create:** `.ai/prompts/{task-name}.prompt.md`
+#### Naming Conventions
 
-**Format:**
-
-```markdown
-# Prompt: {Task Name}
-
-> **Agent:** [@{agent}](.ai/agents/{agent}.agent.md)
-> **Usage:** `@workspace using @{agent} and this prompt, <request>`
-
-## Objective
-
-What this prompt achieves.
-
-## Instructions
-
-Step-by-step instructions for the AI to follow.
-
-## Output Format
-
-How the response should be structured.
-```
-
-**Usage:** `@workspace using the {task-name} prompt, do something`
+| Type | File Location | Naming Pattern | Example |
+|------|---------------|----------------|---------|
+| Agent | `agents/` | `{name}.agent.md` | `devops.agent.md` |
+| Prompt | `prompts/` | `{task-name}.prompt.md` | `deploy.prompt.md` |
+| Skill | `skills/` | `{topic}/SKILL.md` | `docker-containers/SKILL.md` |
+| Rule | `rules/` | `{topic}.md` | `ci-cd-pipeline.md` |
 
 ---
 
@@ -419,15 +376,15 @@ How the response should be structured.
 This system is currently configured for **Laravel/PHP**, but the architecture is stack-agnostic. To adapt for your stack:
 
 | Step | What to do |
-|------|-----------|
+|------|------------|
 | 1 | Fork this repository |
-| 2 | Replace `.ai/skills/` files with your stack's patterns (e.g., NestJS, Django, Spring Boot) |
-| 3 | Replace `.ai/rules/` files with your team's mandates |
-| 4 | Rewrite agent personas in `.ai/agents/` to match your domain |
-| 5 | Update prompt templates in `.ai/prompts/` for your workflows |
+| 2 | Replace `skills/` files with your stack's patterns (e.g., NestJS, Django, Spring Boot) |
+| 3 | Replace `rules/` files with your team's mandates |
+| 4 | Rewrite agent personas in `agents/` to match your domain |
+| 5 | Update prompt templates in `prompts/` for your workflows |
 | 6 | Update `AGENTS.md` to reflect the new content |
 
-The folder structure (`.ai/agents/`, `.ai/skills/`, `.ai/rules/`, `.ai/prompts/`) and the file naming conventions stay the same regardless of tech stack.
+The folder structure (`agents/`, `skills/`, `rules/`, `prompts/`) and the file naming conventions stay the same regardless of tech stack.
 
 ---
 
