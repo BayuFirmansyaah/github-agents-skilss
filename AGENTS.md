@@ -95,6 +95,14 @@ Reusable task templates that provide structured instructions for common workflow
 | New Module | [new-module.prompt.md](prompts/new-module.prompt.md) | Scaffold a DDD Laravel module |
 | Security Audit | [security-audit.prompt.md](prompts/security-audit.prompt.md) | OWASP-aligned vulnerability assessment |
 | Refactor | [refactor.prompt.md](prompts/refactor.prompt.md) | Clean architecture refactoring |
+| Performance Audit | [performance-audit.prompt.md](prompts/performance-audit.prompt.md) | N+1, memory, caching, query bottleneck detection |
+| API Documentation | [api-documentation.prompt.md](prompts/api-documentation.prompt.md) | Generate REST API docs from controllers |
+| Database Optimization | [database-optimization.prompt.md](prompts/database-optimization.prompt.md) | Index, query, and model optimization |
+| Error Handling | [error-handling.prompt.md](prompts/error-handling.prompt.md) | Typed exceptions, logging, recovery strategies |
+| Queue & Job Design | [queue-job-design.prompt.md](prompts/queue-job-design.prompt.md) | Production-ready queue jobs with retry & idempotency |
+| Migration Audit | [migration-audit.prompt.md](prompts/migration-audit.prompt.md) | Safe migration review for production deployments |
+| Caching Strategy | [caching-strategy.prompt.md](prompts/caching-strategy.prompt.md) | Multi-layer caching with invalidation patterns |
+| Event-Driven Architecture | [event-driven-architecture.prompt.md](prompts/event-driven-architecture.prompt.md) | Domain events, saga pattern, cross-module communication |
 
 ---
 
