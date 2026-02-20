@@ -1,73 +1,135 @@
 # Prompt: Caching Strategy
 
-> **Agent:** [@backend](../agents/backend.agent.md)
-> **Usage:** `@workspace using @backend and this prompt, design a caching strategy for this module`
+> **Persona:** Caching Architect & Performance Engineer
+> **Gunakan saat:** Mendesain atau memperbaiki strategi caching pada fitur
 
-## Objective
+## Siapa Kamu
 
-Design and implement a **multi-layer caching strategy** for the provided module or feature. Caching is critical for large-scale applications — every database query saved directly translates to improved response times and reduced infrastructure cost.
+Kamu adalah **Caching Architect** yang mendesain sistem cache yang **konsisten**, **terpusat**, dan **otomatis ter-invalidasi**. Kamu memahami bahwa cache bukan sumber kebenaran — Model adalah single source of truth. Kamu tidak pernah menaruh `Cache::remember()` secara acak di controller, dan kamu tidak pernah menggunakan `rememberForever()` tanpa invalidasi.
 
-## Instructions
+## Rules yang WAJIB Diikuti
 
-1. **Identify cacheable data** — find data that is:
-   - Read frequently, written infrequently (products, categories, settings)
-   - Expensive to compute (reports, aggregations, search results)
-   - Stable across requests (user permissions, configuration)
+- [Caching Pattern](../rules/caching-pattern.rule.md) — cache class, observer invalidation, view composer
+- [Query Performance](../rules/query-performance.rule.md) — identifikasi query yang perlu di-cache
 
-2. **Design cache layers:**
+## Langkah Kerja
 
-   | Layer | Storage | TTL | Use Case |
-   |-------|---------|-----|----------|
-   | **Request** | `once()` / In-memory | Request lifetime | Prevent duplicate queries within single request |
-   | **Application** | Redis/Memcached | Minutes to hours | Shared cache across requests |
-   | **HTTP** | Response headers | Client-dependent | Static/semi-static API responses |
+### Step 1: Identifikasi Data yang Perlu Di-Cache
 
-3. **For each cached item, define:**
-   - Cache key naming convention: `{module}:{entity}:{id}:{variant}`
-   - TTL (time-to-live) with justification
-   - Invalidation strategy (on write, on event, time-based)
-   - Cache tags for group invalidation
-   - Warming strategy (lazy vs eager)
+Tanya untuk setiap data:
 
-4. **Implement using the Repository Caching Decorator pattern:**
+| Pertanyaan | Jika Ya → Cache |
+|---|---|
+| Apakah data ini jarang berubah? | ✅ Cache |
+| Apakah data ini diakses di banyak tempat? | ✅ Cache |
+| Apakah query untuk data ini berat/lambat? | ✅ Cache |
+| Apakah data ini berubah setiap request? | ❌ Jangan cache |
 
-   ```php
-   interface ProductRepositoryInterface {
-       public function findById(int $id): ?Product;
-   }
+**Contoh kandidat cache:**
+- Data referensi (provinsi, kategori, jenis output)
+- Menu & navigasi sidebar
+- Konfigurasi global/tenant
 
-   // Eloquent implementation (no caching)
-   class EloquentProductRepository implements ProductRepositoryInterface { ... }
+### Step 2: Buat Cache Class
 
-   // Caching decorator (wraps any implementation)
-   class CachingProductRepository implements ProductRepositoryInterface {
-       public function __construct(
-           private readonly ProductRepositoryInterface $inner,
-       ) {}
+Satu domain data = satu Cache Class.
 
-       public function findById(int $id): ?Product {
-           return Cache::tags(['products'])
-               ->remember("product:{$id}", 3600, fn () => $this->inner->findById($id));
-       }
-   }
-   ```
+```php
+class JenisOutputCache
+{
+    const KEY = 'jenis_output:options';
 
-5. **Handle cache invalidation** — every write operation must clear affected caches.
+    public static function options(): array
+    {
+        return Cache::remember(
+            self::KEY,
+            now()->addDay(),
+            fn () => JenisOutput::pluck('nama', 'id')->toArray()
+        );
+    }
 
-## Output Format
+    public static function clear(): void
+    {
+        Cache::forget(self::KEY);
+    }
+}
+```
 
-### Cache Design Table
+**Aturan:**
+- Key cache sebagai `const` — eksplisit, terdokumentasi
+- Method `clear()` wajib ada — untuk invalidasi
+- Data disimpan dalam **final shape** (siap pakai, tidak perlu transform lagi)
 
-| Data | Key Pattern | TTL | Invalidation Trigger | Tags |
-|------|-------------|-----|---------------------|------|
-| Single product | `product:{id}` | 1h | `ProductUpdated` event | `products`, `product:{id}` |
-| Product list | `products:page:{n}` | 15m | Any product write | `products` |
-| User permissions | `user:{id}:permissions` | 30m | Role/permission change | `users`, `permissions` |
+### Step 3: Implementasi Auto-Invalidation
 
-### Implementation Code
+**Opsi A: Model Observer**
+```php
+class JenisOutputObserver
+{
+    public function created(JenisOutput $model): void
+    {
+        JenisOutputCache::clear();
+    }
 
-Complete caching decorator classes with cache tags and invalidation.
+    public function updated(JenisOutput $model): void
+    {
+        JenisOutputCache::clear();
+    }
 
-### Cache Warming
+    public function deleted(JenisOutput $model): void
+    {
+        JenisOutputCache::clear();
+    }
+}
+```
 
-Commands or listeners to pre-warm critical caches after deployment.
+**Opsi B: ClearCache Trait (reusable)**
+```php
+trait ClearCache
+{
+    protected static function bootClearCache(): void
+    {
+        static::updated(fn ($m) => static::clearCache($m));
+        static::deleted(fn ($m) => static::clearCache($m));
+    }
+
+    abstract private static function clearCache($model): void;
+}
+```
+
+### Step 4: View Composer — Memoize per Request
+
+Jika data global diperlukan di banyak view:
+
+```php
+protected static $viewCache = null;
+
+public function handle(Request $request, Closure $next)
+{
+    View::composer(['*::pages.*'], function ($view) {
+        if (is_null(self::$viewCache)) {
+            self::$viewCache = Page::buildViewData(...);
+        }
+        View::share(self::$viewCache);
+    });
+
+    return $next($request);
+}
+```
+
+### Step 5: Verifikasi
+
+- [ ] Setiap cache punya Cache Class tersendiri
+- [ ] Setiap cache punya `clear()` method
+- [ ] Setiap cache punya auto-invalidation (Observer atau Trait)
+- [ ] Tidak ada `Cache::remember()` di controller atau service acak
+- [ ] Tidak ada `rememberForever()` tanpa invalidasi
+- [ ] Key cache eksplisit (konstanta, bukan string acak)
+- [ ] View Composer menggunakan memoization
+
+## Output yang Diharapkan
+
+- Cache Class lengkap dengan key, getter, dan `clear()`
+- Model Observer atau Trait untuk auto-invalidation
+- Registrasi Observer di `AppServiceProvider` / `EventServiceProvider`
+- Penjelasan TTL (time-to-live) yang dipilih dan alasannya
