@@ -1,33 +1,33 @@
 # Rule: Naming Convention & MVC + Service Architecture
 
-Kamu adalah seorang Engineer yang bekerja dalam tim dengan arsitektur **MVC + Service Layer** (tanpa Repository layer). Setiap kode yang kamu tulis harus mengikuti standar penamaan yang konsisten dan menempatkan logic di layer yang tepat. Tidak ada business rule di Blade, tidak ada query kompleks di Controller.
+You are an Engineer who works in a team with an **MVC + Service Layer** architecture (without a Repository layer). Every piece of code you write must follow consistent naming standards and place logic in the appropriate layer. No business rules in Blade, no complex queries in Controller.
 
 ---
 
-## Standar Penamaan
+## Naming Standards
 
-### Konvensi Umum
+### General Conventions
 
-Wajib mengikuti **PSR-1**, **PSR-4**, dan **PSR-12**.
+Must follow **PSR-1**, **PSR-4**, and **PSR-12**.
 
-| Elemen | Aturan | Contoh |
+| Element | Rule | Example |
 |---|---|---|
 | Controller | Singular | `ArticleController` |
 | Model | Singular | `User` |
 | Route | Plural | `/articles` |
 | Table | Plural snake_case | `article_comments` |
 | Variable | camelCase | `$activeUsers` |
-| Collection | Plural & deskriptif | `$activeUsers`, `$paidOrders` |
+| Collection | Plural & descriptive | `$activeUsers`, `$paidOrders` |
 | Method | camelCase & verb-based | `calculateTotal()`, `sendNotification()` |
 | View | snake_case | `show_filtered.blade.php` |
 
-**Engineering rule:** "Jika sebuah nama tidak bisa dijelaskan tanpa komentar, maka namanya salah."
+**Engineering rule:** "If a name cannot be explained without a comment, then the name is wrong."
 
 ---
 
-## Arsitektur MVC + Service Layer
+## MVC + Service Layer Architecture
 
-### Struktur Folder
+### Folder Structure
 
 ```
 app/
@@ -40,32 +40,32 @@ app/
 └── Providers/
 ```
 
-**Tidak menggunakan:**
+**Not used:**
 ```
-app/Repositories/    ← TIDAK DIPAKAI
+app/Repositories/    ← NOT USED
 ```
 
-**Alasan tidak pakai Repository:**
-1. Eloquent sudah berfungsi sebagai data access layer
-2. Repository sering menjadi wrapper pasif tanpa nilai tambah
-3. Menambah kompleksitas tanpa kebutuhan nyata
+**Reasons for not using Repository:**
+1. Eloquent already functions as a data access layer
+2. Repository often becomes a passive wrapper without added value
+3. Adds complexity without a real need
 
-Repository hanya dipertimbangkan jika: multi data source, query sangat kompleks lintas domain, atau kebutuhan swap persistence layer.
+Repository is only considered if: multiple data sources, highly complex cross-domain queries, or a need to swap the persistence layer.
 
 ---
 
-## Tanggung Jawab Tiap Layer
+## Responsibilities of Each Layer
 
 ### Model
 
-**Fokus pada:**
-- Representasi tabel
-- Relasi antar model
-- Scope query
-- Domain helper sederhana (pure logic kecil)
+**Focus on:**
+- Table representation
+- Relations between models
+- Query scopes
+- Simple domain helpers (small pure logic)
 
 ```php
-// ✅ Model yang benar
+// ✅ Correct Model
 class Order extends Model
 {
     protected $fillable = ['user_id', 'reference', 'status'];
@@ -87,24 +87,24 @@ class Order extends Model
 }
 ```
 
-**Yang TIDAK BOLEH di Model:**
-- Mengakses Request
-- Mengirim email
-- Menjalankan transaction kompleks
-- Query lintas banyak domain
+**What MUST NOT be in Model:**
+- Accessing Request
+- Sending emails
+- Running complex transactions
+- Cross-domain queries
 
 ---
 
 ### Controller
 
-**Fokus pada:**
-- Menerima request
-- Validasi (via Form Request)
-- Memanggil Service
-- Mengembalikan response
+**Focus on:**
+- Receiving request
+- Validation (via Form Request)
+- Calling Service
+- Returning response
 
 ```php
-// ✅ Controller yang benar — tipis & deterministik
+// ✅ Correct Controller — thin & deterministic
 class OrderController extends Controller
 {
     public function store(StoreOrderRequest $request, OrderService $service)
@@ -115,26 +115,26 @@ class OrderController extends Controller
 }
 ```
 
-**Yang TIDAK BOLEH di Controller:**
-- Query kompleks
-- Looping domain logic
-- Perhitungan bisnis
-- Transaction orchestration yang berat
+**What MUST NOT be in Controller:**
+- Complex queries
+- Domain logic loops
+- Business calculations
+- Heavy transaction orchestration
 
-**Indikator masalah:** Jika controller lebih dari ±15–20 baris logic aktif, itu indikasi business logic belum dipindahkan ke Service.
+**Problem indicator:** If a controller has more than ~15–20 lines of active logic, it's a sign that business logic has not been moved to a Service.
 
 ---
 
-### Service (Pusat Business Logic)
+### Service (Business Logic Center)
 
-**Bertanggung jawab atas:**
-- Validasi domain (di luar validasi request)
-- Orkestrasi transaction
-- Integrasi dengan service eksternal
-- Penegakan business invariant
+**Responsible for:**
+- Domain validation (beyond request validation)
+- Transaction orchestration
+- Integration with external services
+- Enforcing business invariants
 
 ```php
-// ✅ Service yang benar
+// ✅ Correct Service
 class OrderService
 {
     public function create(array $data): Order
@@ -160,38 +160,38 @@ class OrderService
 
 ---
 
-## Alur Request Lengkap
+## Complete Request Flow
 
 ```
-Request masuk
+Request comes in
     ↓
-FormRequest → validasi format
+FormRequest → format validation
     ↓
-Controller → panggil Service
+Controller → calls Service
     ↓
-Service → jalankan business logic + transaction
+Service → runs business logic + transaction
     ↓
-Model → persist data
+Model → persists data
     ↓
-Response dikembalikan
+Response returned
 ```
 
-Flow deterministik & mudah dilacak.
+Deterministic & easy to trace flow.
 
 ---
 
-## Anti-Pattern yang Dilarang
+## Prohibited Anti-Patterns
 
-| Anti-Pattern | Mengapa Salah |
+| Anti-Pattern | Why It's Wrong |
 |---|---|
-| Business rule di Blade | Logic tersembunyi, tidak bisa di-test |
-| Query kompleks di Controller | Controller jadi fat, sulit maintain |
-| Request logic di Model | Model tidak seharusnya tahu tentang HTTP |
-| Cache logic tersebar | Sulit di-invalidasi, data stale |
-| Service hanya wrapper tipis | Tidak menambah nilai, tambah kompleksitas |
-| Manual join tanpa relasi Eloquent | Tidak framework-aligned, sulit maintain |
+| Business rules in Blade | Hidden logic, cannot be tested |
+| Complex queries in Controller | Controller becomes fat, hard to maintain |
+| Request logic in Model | Model should not know about HTTP |
+| Scattered cache logic | Hard to invalidate, stale data |
+| Service as thin wrapper only | Adds no value, adds complexity |
+| Manual join without Eloquent relations | Not framework-aligned, hard to maintain |
 
-### DO: Gunakan Relasi Eloquent
+### DO: Use Eloquent Relations
 
 ```php
 // ✅ Framework-aligned
@@ -208,7 +208,7 @@ $orders = Order::with('user')->get();
 ### DON'T: Manual Join
 
 ```php
-// ❌ Melawan desain Laravel
+// ❌ Against Laravel's design
 DB::table('orders')
     ->join('users', 'orders.user_id', '=', 'users.id')
     ->get();

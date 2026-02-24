@@ -1,40 +1,40 @@
 # Rule: Laravel Octane + FrankenPHP Runtime
 
-Kamu adalah seorang Engineer yang memahami bahwa menggunakan **Laravel Octane** mengubah sifat aplikasi dari **request-terminate** menjadi **long-running process**. Ini berarti aplikasi hidup terus-menerus di memori (RAM), dan setiap kelalaian dalam pengelolaan state bisa menyebabkan **memory leak**, **data bleed antar request**, atau **server crash**.
+You are an Engineer who understands that using **Laravel Octane** changes the application's nature from **request-terminate** to a **long-running process**. This means the application stays alive continuously in memory (RAM), and any negligence in state management can cause **memory leaks**, **data bleed between requests**, or **server crashes**.
 
 ---
 
-## Standar Implementasi
+## Implementation Standards
 
-1. **Wajib** menggunakan Laravel Octane untuk lingkungan produksi
-2. Server/Driver yang digunakan: **FrankenPHP**
-3. **Tidak lagi** menggunakan PHP-FPM standar kecuali untuk kebutuhan legacy khusus
+1. **Mandatory** to use Laravel Octane for production environments
+2. Server/Driver used: **FrankenPHP**
+3. **No longer** using standard PHP-FPM except for specific legacy needs
 
 ---
 
-## Implikasi Engineering (Wajib Diperhatikan)
+## Engineering Implications (Must Be Observed)
 
-### 1. Pengelolaan State & Memori (Memory Leaks)
+### 1. State & Memory Management (Memory Leaks)
 
-**Masalah:** Aplikasi hidup terus di RAM. Kebocoran kecil akan menumpuk hingga server crash.
+**Problem:** The application stays alive in RAM. Small leaks will accumulate until the server crashes.
 
-**Aturan:**
-- Hindari menambahkan data ke dalam array statis atau global variabel yang tidak dibersihkan setelah request selesai
-- Jangan gunakan `static` property untuk menyimpan data request-specific tanpa cleanup
+**Rules:**
+- Avoid appending data to static arrays or global variables that are not cleaned up after the request completes
+- Do not use `static` properties to store request-specific data without cleanup
 
 ```php
-// ❌ BAHAYA: Static array yang terus bertambah setiap request
+// ❌ DANGER: Static array that keeps growing with each request
 class Logger
 {
     protected static array $logs = [];
 
     public static function log(string $message): void
     {
-        self::$logs[] = $message; // Tidak pernah dibersihkan!
+        self::$logs[] = $message; // Never cleaned up!
     }
 }
 
-// ✅ AMAN: Gunakan per-request scope atau bersihkan setelah request
+// ✅ SAFE: Use per-request scope or clean up after request
 class Logger
 {
     public function __construct(
@@ -46,7 +46,7 @@ class Logger
         $this->logs[] = $message;
     }
 }
-// Bind sebagai scoped agar di-resolve ulang setiap request
+// Bind as scoped so it's re-resolved on every request
 // $this->app->scoped(Logger::class);
 ```
 
@@ -54,58 +54,58 @@ class Logger
 
 ### 2. Dependency Injection & Singleton
 
-**Masalah:** Singleton hanya di-resolve SEKALI saat worker boot. Jika singleton menyimpan state request, request berikutnya akan mendapat data request sebelumnya (data bleed).
+**Problem:** Singletons are resolved ONCE when the worker boots. If a singleton stores request state, the next request will receive the previous request's data (data bleed).
 
-**Aturan:**
-- Hati-hati saat me-resolve service berbentuk Singleton
-- Pastikan Singleton **tidak menyimpan** state spesifik milik user/request
-- Gunakan **Scoped binding** jika objek bergantung pada state request saat ini
+**Rules:**
+- Be careful when resolving services registered as Singleton
+- Ensure Singletons **do not store** user/request-specific state
+- Use **Scoped binding** if an object depends on the current request state
 
 ```php
-// Di AppServiceProvider:
+// In AppServiceProvider:
 
-// ✅ Scoped: di-resolve ulang setiap request cycle
+// ✅ Scoped: re-resolved on every request cycle
 $this->app->scoped(CartService::class, function ($app) {
     return new CartService($app->make('request')->user());
 });
 
-// ❌ Singleton: BAHAYA jika menyimpan request state
+// ❌ Singleton: DANGEROUS if it stores request state
 $this->app->singleton(CartService::class, function ($app) {
     return new CartService($app->make('request')->user());
-    // User dari request pertama akan "melekat" ke semua request!
+    // User from the first request will "stick" to all requests!
 });
 ```
 
 ---
 
-### 3. Konstruktor & Destruktor
+### 3. Constructors & Destructors
 
-**Masalah:** Konstruktor service global hanya dijalankan **sekali saat worker booting** (bukan setiap request).
+**Problem:** Global service constructors are only executed **once when the worker boots** (not on every request).
 
-**Aturan:**
-- Jangan menaruh logika inisialisasi per-request di dalam `__construct()` milik service Singleton/Long-lived
-- Gunakan **method injection** untuk data yang berubah per-request
+**Rules:**
+- Do not place per-request initialization logic inside `__construct()` of Singleton/Long-lived services
+- Use **method injection** for data that changes per-request
 
-### DO: Method Injection untuk Request-Specific Data
+### DO: Method Injection for Request-Specific Data
 
 ```php
-// ✅ AMAN: $request di-inject per-method, selalu fresh
+// ✅ SAFE: $request is injected per-method, always fresh
 class OrderController extends Controller
 {
     public function handle(Request $request, OrderService $service)
     {
-        // $request adalah milik user yang sedang mengakses saat ini
+        // $request belongs to the user currently accessing
         return $service->process($request->user());
     }
 }
 ```
 
-### DON'T: Constructor Injection untuk Request State
+### DON'T: Constructor Injection for Request State
 
 ```php
-// ❌ BAHAYA DI OCTANE:
-// Konstruktor mungkin hanya jalan sekali saat server start
-// $request yang di-inject bisa jadi stale (milik request pertama)
+// ❌ DANGEROUS IN OCTANE:
+// Constructor may only run once at server start
+// The injected $request may be stale (from the first request)
 class OrderService
 {
     protected $currentUser;
@@ -119,25 +119,25 @@ class OrderService
 
 ---
 
-## Checklist Octane-Safety
+## Octane-Safety Checklist
 
-Sebelum deploy ke Octane, pastikan:
+Before deploying to Octane, ensure:
 
-- [ ] Tidak ada static property yang menyimpan data request-specific tanpa cleanup
-- [ ] Tidak ada Singleton yang menyimpan `$request`, `auth()->user()`, atau session data
-- [ ] Konstruktor service global tidak melakukan inisialisasi per-request
-- [ ] Semua request-dependent service menggunakan **Scoped binding**
-- [ ] Tidak ada global variable yang terus bertambah tanpa batas
-- [ ] File handles dan koneksi database di-clean setelah selesai
+- [ ] No static properties storing request-specific data without cleanup
+- [ ] No Singleton storing `$request`, `auth()->user()`, or session data
+- [ ] Global service constructors do not perform per-request initialization
+- [ ] All request-dependent services use **Scoped binding**
+- [ ] No global variables that keep growing without limit
+- [ ] File handles and database connections are cleaned up after completion
 
 ---
 
-## Ringkasan Perbedaan PHP-FPM vs Octane
+## Summary: PHP-FPM vs Octane Differences
 
-| Aspek | PHP-FPM (Lama) | Octane / FrankenPHP |
+| Aspect | PHP-FPM (Legacy) | Octane / FrankenPHP |
 |---|---|---|
-| Lifecycle | Boot → Handle → Terminate | Boot (sekali) → Handle → Handle → ... |
-| Static property | Reset setiap request | Persist antar request |
-| Singleton | Baru setiap request | Dibuat sekali, reuse |
-| Memory | Auto-cleanup setiap request | Harus dikelola manual |
-| Constructor | Dijalankan setiap request | Dijalankan sekali saat boot |
+| Lifecycle | Boot → Handle → Terminate | Boot (once) → Handle → Handle → ... |
+| Static property | Reset every request | Persists across requests |
+| Singleton | New every request | Created once, reused |
+| Memory | Auto-cleanup every request | Must be managed manually |
+| Constructor | Executed every request | Executed once at boot |

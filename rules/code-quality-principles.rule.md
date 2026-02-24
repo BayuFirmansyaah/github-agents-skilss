@@ -1,17 +1,17 @@
 # Rule: Code Quality Principles
 
-Kamu adalah seorang Engineer yang menulis kode dengan kualitas tinggi berdasarkan prinsip-prinsip yang telah disepakati tim. Setiap baris kode harus **readable**, **consistent**, **type-safe**, dan **framework-aligned**. Kamu menggunakan Laravel sesuai desain aslinya, bukan melawannya.
+You are an Engineer who writes high-quality code based on team-agreed principles. Every line of code must be **readable**, **consistent**, **type-safe**, and **framework-aligned**. You use Laravel as it was designed, not against it.
 
 ---
 
 ## 1. Readable Before Clever
 
-Kode harus mudah dibaca **sebelum** dianggap ringkas atau "smart".
+Code must be easy to read **before** being considered concise or "smart."
 
-### DON'T: Terlalu Clever
+### DON'T: Too Clever
 
 ```php
-// ❌ Secara teknis benar, tapi sulit debug & tidak jelas tujuannya
+// ❌ Technically correct, but hard to debug & unclear intent
 $total = collect($orders)->filter(fn($o) => $o->status === 'paid')
     ->map(fn($o) => $o->items->sum('price'))
     ->sum();
@@ -20,7 +20,7 @@ $total = collect($orders)->filter(fn($o) => $o->status === 'paid')
 ### DO: Readable & Intentional
 
 ```php
-// ✅ Lebih panjang, tapi intensi jelas, mudah debug & breakpoint
+// ✅ Longer, but intent is clear, easy to debug & breakpoint
 $paidOrders = $orders->where('status', 'paid');
 
 $totalRevenue = $paidOrders->sum(function ($order) {
@@ -28,40 +28,40 @@ $totalRevenue = $paidOrders->sum(function ($order) {
 });
 ```
 
-**Rule of thumb:** "Jika reviewer harus berhenti lebih dari 3 detik untuk memahami satu baris kode, baris tersebut perlu disederhanakan."
+**Rule of thumb:** "If a reviewer has to pause for more than 3 seconds to understand a single line of code, that line needs to be simplified."
 
 ---
 
 ## 2. Consistency Over Preference
 
-Konsistensi tim lebih penting daripada gaya pribadi developer.
-- Jika tim sepakat pakai Service Class → semua pakai Service Class
-- Jika tim sepakat naming convention tertentu → semua ikuti
+Team consistency is more important than individual developer style.
+- If the team agrees to use Service Class → everyone uses Service Class
+- If the team agrees on a certain naming convention → everyone follows it
 
 ---
 
 ## 3. Single Source of Truth (SSOT)
 
-Tidak boleh ada duplikasi logika bisnis. Aturan yang sama TIDAK boleh ditulis di lebih dari satu tempat.
+There must be no duplication of business logic. The same rule MUST NOT be written in more than one place.
 
-### DON'T: Duplikasi Logic
+### DON'T: Duplicated Logic
 
 ```php
-// ❌ Di Controller:
+// ❌ In Controller:
 if ($order->status !== 'paid') {
     abort(403);
 }
 
-// ❌ Di Service lain (aturan SAMA, ditulis lagi):
+// ❌ In another Service (SAME rule, written again):
 if ($order->status !== 'paid') {
     throw new Exception('Invalid order');
 }
 ```
 
-### DO: Sentralkan di Service/Model
+### DO: Centralize in Service/Model
 
 ```php
-// ✅ Aturan ditulis SEKALI di Model/Service
+// ✅ Rule written ONCE in Model/Service
 class Order extends Model
 {
     public function isPaid(): bool
@@ -70,7 +70,7 @@ class Order extends Model
     }
 }
 
-// Dipakai di mana saja:
+// Used anywhere:
 if (! $order->isPaid()) { ... }
 ```
 
@@ -78,48 +78,48 @@ if (! $order->isPaid()) { ... }
 
 ## 4. Single Responsibility Principle (SRP)
 
-Setiap class dan method hanya boleh memiliki **satu tanggung jawab**.
+Every class and method should have only **one responsibility**.
 
-**Indikasi pelanggaran SRP:**
-- Method terlalu panjang
-- Terlalu banyak if/else
-- Sulit dijelaskan dalam satu kalimat
+**Signs of SRP violation:**
+- Method is too long
+- Too many if/else blocks
+- Difficult to explain in one sentence
 
-**Praktik yang dianjurkan:**
-1. Pisahkan validasi, formatting, dan business rule
-2. Gunakan method kecil dengan nama yang jelas
-3. Pindahkan logika kompleks ke Service atau Domain Layer
+**Recommended practices:**
+1. Separate validation, formatting, and business rules
+2. Use small methods with clear names
+3. Move complex logic to Service or Domain Layer
 
-**"SRP bukan tentang jumlah baris, tapi alasan perubahan."**
+**"SRP is not about line count, but about reasons for change."**
 
 ---
 
 ## 5. Don't Repeat Yourself (DRY)
 
-Setiap aturan bisnis harus memiliki satu sumber kebenaran.
+Every business rule must have a single source of truth.
 
-**Penerapan DRY wajib pada:**
+**Mandatory DRY application:**
 
-| Konteks | Solusi |
+| Context | Solution |
 |---|---|
-| Query Eloquent berulang | Gunakan **local scope** |
-| Blade template berulang | Gunakan `@extends`, `@include`, `@component` |
-| Business logic berulang | Gunakan **Service Class** |
-| Shared behavior antar model | Gunakan **Trait** |
+| Repetitive Eloquent queries | Use **local scope** |
+| Repetitive Blade templates | Use `@extends`, `@include`, `@component` |
+| Repetitive business logic | Use **Service Class** |
+| Shared behavior across models | Use **Trait** |
 
-**Anti-pattern DRY:**
-- Copy-paste query antar model
-- Duplikasi validasi di controller dan service
-- Helper global tanpa konteks domain
+**DRY anti-patterns:**
+- Copy-pasting queries across models
+- Duplicating validation in controller and service
+- Global helpers without domain context
 
 ---
 
-## 6. Type Safety & Kontrak Kode
+## 6. Type Safety & Code Contracts
 
-### Type Declaration (Wajib)
+### Type Declaration (Mandatory)
 
 ```php
-// ✅ Wajib type hint pada parameter dan return value
+// ✅ Mandatory type hints on parameters and return values
 declare(strict_types=1);
 
 public function calculateDiscount(Order $order, float $percentage): float
@@ -127,65 +127,65 @@ public function calculateDiscount(Order $order, float $percentage): float
     return $order->total * ($percentage / 100);
 }
 
-// ✅ Nullable type jika bisa null
+// ✅ Nullable type if it can be null
 public function findUser(int $id): ?User
 {
     return User::find($id);
 }
 
-// ✅ Union type (PHP 8+) jika relevan
+// ✅ Union type (PHP 8+) if relevant
 public function process(int|string $identifier): Result
 {
     // ...
 }
 ```
 
-**Engineering rule:** "Method tanpa return type dianggap incomplete contract."
+**Engineering rule:** "A method without a return type is considered an incomplete contract."
 
 ### DocBlock
 
-Digunakan untuk:
-1. Dokumentasi
+Used for:
+1. Documentation
 2. Static analysis (PHPStan, Psalm)
-3. Konteks tambahan di luar tipe native (misalnya: `@param array<int, OrderItem> $items`)
+3. Additional context beyond native types (e.g., `@param array<int, OrderItem> $items`)
 
 ---
 
 ## 7. Code Style & Laravel Pint
 
-**Laravel Pint** wajib digunakan sebagai formatter standar.
+**Laravel Pint** is mandatory as the standard formatter.
 
-**Aturan:**
-1. Pint dijalankan **sebelum commit**
-2. Tidak ada diskusi subjektif soal formatting di code review
-3. Gunakan format `pint` bawaan Laravel (preset default)
+**Rules:**
+1. Pint must be run **before every commit**
+2. No subjective formatting discussions in code reviews
+3. Use the default Laravel `pint` preset
 
-**Manfaat:**
-- Konsistensi lintas tim
-- Review fokus ke logika, bukan spasi/indentasi
+**Benefits:**
+- Consistency across the team
+- Reviews focus on logic, not spaces/indentation
 
 ---
 
-## 8. Larangan Meng-override Fitur Inti Laravel
+## 8. Prohibition of Overriding Laravel Core Features
 
-### Dilarang
+### Prohibited
 
-- Mengubah behavior internal Laravel
-- Meng-override core class tanpa alasan arsitektural kuat
+- Modifying internal Laravel behavior
+- Overriding core classes without strong architectural justification
 
-### Prinsip Resmi: **"Extend, don't modify"**
+### Official Principle: **"Extend, don't modify"**
 
-### Risiko Override
+### Risks of Overriding
 
-| Risiko | Dampak |
+| Risk | Impact |
 |---|---|
-| Masalah saat upgrade Laravel | Breaking changes tak terduga |
-| Bug tersembunyi | Sulit trace karena behavior non-standar |
-| Ketergantungan pada implementasi internal | Fragile code |
+| Issues during Laravel upgrades | Unexpected breaking changes |
+| Hidden bugs | Difficult to trace due to non-standard behavior |
+| Dependency on internal implementation | Fragile code |
 
-### Gunakan Alternatif
+### Use Alternatives
 
-- **Service Provider** — untuk binding dan bootstrapping
-- **Event / Listener** — untuk hook ke lifecycle Laravel
-- **Macro** — untuk extend class tanpa modify
-- **Custom abstraction** — untuk layer tambahan di atas framework
+- **Service Provider** — for binding and bootstrapping
+- **Event / Listener** — for hooking into Laravel lifecycle
+- **Macro** — for extending classes without modifying
+- **Custom abstraction** — for additional layers on top of the framework

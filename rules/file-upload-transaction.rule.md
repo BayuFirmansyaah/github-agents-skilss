@@ -1,30 +1,30 @@
 # Rule: File Upload & Database Transaction
 
-Kamu adalah seorang Engineer yang memahami perbedaan fundamental antara **database transaction** (transactional & rollback-able) dan **filesystem** (non-transactional). Kamu TIDAK PERNAH menaruh operasi upload file di dalam `DB::transaction()`.
+You are an Engineer who understands the fundamental difference between **database transactions** (transactional & rollback-able) and **filesystems** (non-transactional). You NEVER place file upload operations inside `DB::transaction()`.
 
 **Rule: "Transaction boundary ≠ Business flow boundary"**
 
 ---
 
-## Prinsip Desain
+## Design Principles
 
-Database transaction harus:
-1. **Cepat** — tidak menunggu IO eksternal
-2. **Pendek** — selesai dalam waktu singkat
-3. **Bebas IO eksternal** — tidak ada filesystem, network call, atau API call di dalamnya
+Database transactions must be:
+1. **Fast** — not waiting for external IO
+2. **Short** — completed in a brief time
+3. **Free of external IO** — no filesystem, network calls, or API calls inside them
 
-**Filesystem ≠ bagian dari transaksi database.**
+**Filesystem ≠ part of a database transaction.**
 
 ---
 
-## DO: Upload File di Luar Transaction
+## DO: Upload Files Outside the Transaction
 
 ```php
 public function update(array $data, int $id): DokumenKegiatan|Error
 {
     $model = $this->model->findOrFail($id);
 
-    // 1. Siapkan upload (belum sentuh DB)
+    // 1. Prepare upload (no DB touch yet)
     $upload = $this->processUploadDocument(
         $data,
         'id_dokumen',
@@ -32,7 +32,7 @@ public function update(array $data, int $id): DokumenKegiatan|Error
         $model
     );
 
-    // 2. Jika ada upload → lakukan upload fisik DULU
+    // 2. If there's an upload → perform physical upload FIRST
     if (!empty($upload)) {
         $uploadResult = $upload->executeUpload();
 
@@ -45,7 +45,7 @@ public function update(array $data, int $id): DokumenKegiatan|Error
         unset($data['id_dokumen']);
     }
 
-    // 3. Baru mulai DB transaction (singkat & deterministik)
+    // 3. Then start DB transaction (short & deterministic)
     DB::beginTransaction();
 
     try {
@@ -55,7 +55,7 @@ public function update(array $data, int $id): DokumenKegiatan|Error
     } catch (\Throwable $e) {
         DB::rollBack();
 
-        // 4. Cleanup file jika DB gagal
+        // 4. Cleanup file if DB fails
         if (!empty($upload)) {
             $upload->rollbackUpload();
         }
@@ -65,22 +65,22 @@ public function update(array $data, int $id): DokumenKegiatan|Error
 }
 ```
 
-**Alur yang benar:**
-1. Upload file ke filesystem/object storage
-2. Jika upload berhasil → mulai DB transaction
-3. Simpan referensi file (path/metadata) di DB
+**Correct flow:**
+1. Upload file to filesystem/object storage
+2. If upload succeeds → start DB transaction
+3. Save file reference (path/metadata) in DB
 4. Commit transaction
-5. Jika DB gagal → cleanup file yang sudah ter-upload
+5. If DB fails → cleanup the already uploaded file
 
 ---
 
-## DON'T: Upload File di Dalam Transaction
+## DON'T: Upload Files Inside a Transaction
 
 ```php
-// ❌ JANGAN LAKUKAN INI
+// ❌ DO NOT DO THIS
 public function update(array $data, int $id): DokumenKegiatan|Error
 {
-    DB::beginTransaction(); // Transaction dimulai terlalu awal
+    DB::beginTransaction(); // Transaction started too early
 
     $model = $this->model->findOrFail($id);
     $upload = $this->processUploadDocument($data, ...);
@@ -91,7 +91,7 @@ public function update(array $data, int $id): DokumenKegiatan|Error
 
     $model->update($data);
 
-    // Upload file di DALAM transaction!
+    // Upload file INSIDE transaction!
     $upload?->executeUpload();
 
     DB::commit();
@@ -99,25 +99,25 @@ public function update(array $data, int $id): DokumenKegiatan|Error
 }
 ```
 
-**Mengapa ini berbahaya:**
+**Why this is dangerous:**
 
-| Skenario | Dampak |
+| Scenario | Impact |
 |---|---|
-| File berhasil upload, DB rollback | File orphan tanpa referensi di DB |
-| Upload lambat (network issue) | DB lock menahan resource lebih lama |
-| Upload timeout | Transaction timeout, data inconsistent |
+| File uploads successfully, DB rolls back | Orphan file without DB reference |
+| Upload is slow (network issue) | DB lock holds resources longer |
+| Upload timeout | Transaction timeout, inconsistent data |
 
-**Dampak lanjutan:**
-- Lock database lebih lama → throughput menurun
-- Debugging sangat sulit (lintas layer: DB + filesystem)
-- Inkonsistensi data yang sulit dideteksi
+**Further impact:**
+- Longer database locks → reduced throughput
+- Very difficult debugging (cross-layer: DB + filesystem)
+- Hard-to-detect data inconsistency
 
 ---
 
-## Mekanisme Rollback yang Dianjurkan
+## Recommended Rollback Mechanism
 
-Karena filesystem tidak bisa di-rollback secara otomatis, gunakan salah satu mekanisme berikut:
+Since the filesystem cannot be rolled back automatically, use one of the following mechanisms:
 
-1. **Temporary file** — upload ke lokasi sementara, pindahkan ke lokasi final setelah DB commit
-2. **Retry / idempotent upload** — upload bisa diulang tanpa efek samping
-3. **Manual cleanup** — hapus file secara eksplisit jika DB gagal (seperti contoh DO di atas)
+1. **Temporary file** — upload to a temporary location, move to final location after DB commit
+2. **Retry / idempotent upload** — upload can be retried without side effects
+3. **Manual cleanup** — explicitly delete the file if DB fails (as shown in the DO example above)

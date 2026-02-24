@@ -1,25 +1,25 @@
 # 🧠 Laravel Engineering Playbook
 
-Knowledge base berbasis markdown untuk **GitHub Copilot Chat**. Berisi aturan engineering dan prompt templates yang diekstrak dari **Laravel 12+ Guidelines** internal tim.
+A markdown-based knowledge base for **GitHub Copilot Chat**. Contains engineering rules and prompt templates extracted from the internal team's **Laravel 12+ Guidelines**.
 
-Tanpa build step, tanpa extension — cukup clone ke proyek dan langsung pakai.
+No build step, no extensions — just clone into your project and start using it.
 
 ---
 
-## Apa Isinya?
+## What's Inside?
 
 ```
-rules/        → Aturan engineering yang WAJIB diikuti
-prompts/      → Task templates dengan persona AI untuk berbagai skenario
+rules/        → Engineering rules that MUST be followed
+prompts/      → AI task templates with personas for various scenarios
 ```
 
-### Rules (Aturan)
+### Rules
 
-| File | Topik |
+| File | Topic |
 |------|-------|
-| `livewire-state-management` | Computed vs Public Property, state minimal |
+| `livewire-state-management` | Computed vs Public Property, minimal state |
 | `query-performance` | N+1, eager loading, pluck, json_encode anti-pattern |
-| `file-upload-transaction` | Upload file di luar DB transaction |
+| `file-upload-transaction` | File upload outside DB transaction |
 | `caching-pattern` | Cache Class, Observer invalidation, View Composer |
 | `naming-architecture` | PSR, MVC + Service Layer, naming convention |
 | `code-quality-principles` | SRP, DRY, type safety, Laravel Pint |
@@ -27,50 +27,50 @@ prompts/      → Task templates dengan persona AI untuk berbagai skenario
 
 ### Prompts (Task Templates)
 
-| Prompt | Kegunaan |
-|--------|----------|
-| `/new-feature` | Membuat fitur baru sesuai standar |
-| `/code-review` | Review kode / merge request |
-| `/performance-audit` | Audit bottleneck performa |
-| `/refactor` | Bersihkan technical debt |
-| `/livewire-component` | Bangun komponen Livewire |
-| `/caching-strategy` | Desain strategi caching |
-| `/database-optimization` | Optimasi query & data access |
+| Prompt | Purpose |
+|--------|---------|
+| `/new-feature` | Build a new feature following standards |
+| `/code-review` | Review code / merge request |
+| `/performance-audit` | Audit performance bottlenecks |
+| `/refactor` | Clean up technical debt |
+| `/livewire-component` | Build a Livewire component |
+| `/caching-strategy` | Design a caching strategy |
+| `/database-optimization` | Optimize queries & data access |
 
 ---
 
-## Instalasi
+## Installation
 
-Clone repository ini sebagai folder `.github` di root proyek Laravel kamu:
+Clone this repository as a `.github` folder in the root of your Laravel project:
 
 ```bash
 git clone https://github.com/BayuFirmansyaah/github-agents-skilss.git .github
 ```
 
-Jika tidak butuh git history:
+If you don't need git history:
 
 ```bash
 rm -rf .github/.git
 ```
 
-Atau sebagai git submodule (untuk tetap mendapat update):
+Or as a git submodule (to keep receiving updates):
 
 ```bash
 git submodule add https://github.com/BayuFirmansyaah/github-agents-skilss.git .github
 ```
 
-**Selesai!** Buka VS Code, buka Copilot Chat, dan knowledge base siap digunakan.
+**Done!** Open VS Code, open Copilot Chat, and the knowledge base is ready to use.
 
 ---
 
-## Cara Penggunaan
+## Usage
 
-### Menggunakan Prompt
+### Using Prompts
 
-Di GitHub Copilot Chat, cukup ketik `/` diikuti nama prompt:
+In GitHub Copilot Chat, simply type `/` followed by the prompt name:
 
 ```
-/new-feature Buat modul Inventory dengan CRUD lengkap
+/new-feature Create an Inventory module with full CRUD
 ```
 
 ```
@@ -78,148 +78,148 @@ Di GitHub Copilot Chat, cukup ketik `/` diikuti nama prompt:
 ```
 
 ```
-/performance-audit Cek performa halaman dashboard
+/performance-audit Check the dashboard page performance
 ```
 
 ```
-/refactor Perbaiki OrderService agar sesuai SRP
+/refactor Fix OrderService to comply with SRP
 ```
 
 ```
-/livewire-component Buat komponen form assessment dengan rubrik
+/livewire-component Build an assessment form component with rubric
 ```
 
 ```
-/caching-strategy Desain caching untuk data master provinsi
+/caching-strategy Design caching for province master data
 ```
 
 ```
-/database-optimization Optimasi query di ReportService
+/database-optimization Optimize queries in ReportService
 ```
 
-### Mereferensi Rules
+### Referencing Rules
 
-Kamu juga bisa merujuk rules secara langsung:
-
-```
-@workspace ikuti rules query-performance, optimasi query di file ini
-```
+You can also reference rules directly:
 
 ```
-@workspace berdasarkan rules naming-architecture, review struktur folder ini
-```
-
-### Kombinasi Prompt + Konteks
-
-```
-@workspace /code-review review perubahan di branch feature/payment
+@workspace follow rules query-performance, optimize the queries in this file
 ```
 
 ```
-@workspace /new-feature buat fitur export laporan PDF, ikuti rules caching-pattern
+@workspace based on rules naming-architecture, review this folder structure
+```
+
+### Combining Prompt + Context
+
+```
+@workspace /code-review review changes in branch feature/payment
+```
+
+```
+@workspace /new-feature create a PDF report export feature, follow rules caching-pattern
 ```
 
 ---
 
-## Kustomisasi
+## Customization
 
-### Menambah Rules Baru
+### Adding New Rules
 
-Buat file di `rules/` dengan format:
+Create a file in `rules/` with the following format:
 
 ```markdown
-# Rule: [Nama Rule]
+# Rule: [Rule Name]
 
-[Paragraf konteks — jelaskan prinsip utama]
+[Context paragraph — explain the core principle]
 
-## DO: [Praktik yang Benar]
+## DO: [Correct Practice]
 
 ​```php
-// Contoh kode yang benar
+// Example of correct code
 ​```
 
-## DON'T: [Praktik yang Salah]
+## DON'T: [Incorrect Practice]
 
 ​```php
-// Contoh kode yang salah
+// Example of incorrect code
 ​```
 ```
 
-### Menambah Prompt Baru
+### Adding New Prompts
 
-Buat file di `prompts/` dengan format `nama-prompt.prompt.md`:
+Create a file in `prompts/` with the format `prompt-name.prompt.md`:
 
 ```markdown
-# Prompt: [Nama Prompt]
+# Prompt: [Prompt Name]
 
-> **Persona:** [Peran AI saat menjalankan prompt ini]
-> **Gunakan saat:** [Kapan prompt ini dipakai]
+> **Persona:** [AI role when executing this prompt]
+> **Use when:** [When to use this prompt]
 
-## Siapa Kamu
-[Deskripsi persona]
+## Who You Are
+[Persona description]
 
-## Rules yang WAJIB Diikuti
-- [Rule 1](../rules/nama-rule.rule.md)
-- [Rule 2](../rules/nama-rule.rule.md)
+## Mandatory Rules
+- [Rule 1](../rules/rule-name.rule.md)
+- [Rule 2](../rules/rule-name.rule.md)
 
-## Langkah Kerja
+## Workflow
 ### Step 1: ...
 ### Step 2: ...
 
-## Output yang Diharapkan
-[Format output]
+## Expected Output
+[Output format]
 ```
 
-### Mengubah untuk Stack Lain
+### Adapting for Other Stacks
 
-Fork repository ini dan ganti isi `rules/` dan `prompts/` dengan standar stack kamu sendiri. Struktur folder dan format file bisa tetap sama.
+Fork this repository and replace the contents of `rules/` and `prompts/` with your own stack's standards. The folder structure and file format can remain the same.
 
 ---
 
-## Kontribusi
+## Contributing
 
-Kontribusi terbuka untuk siapa saja!
+Contributions are open to everyone!
 
-### Langkah Kontribusi
+### Contribution Steps
 
-1. **Fork** repository ini
-2. **Clone** fork kamu ke lokal
+1. **Fork** this repository
+2. **Clone** your fork locally
    ```bash
-   git clone https://github.com/<username-kamu>/github-agents-skilss.git
+   git clone https://github.com/<your-username>/github-agents-skilss.git
    ```
-3. **Buat branch** dari `master`
+3. **Create a branch** from `master`
    ```bash
-   git checkout -b feat/nama-kontribusi
+   git checkout -b feat/contribution-name
    ```
-4. **Buat perubahan** — tambah prompt, rule, atau perbaiki yang sudah ada
-5. **Test** — clone ke proyek Laravel sebagai `.github` dan coba di Copilot Chat
-6. **Commit** dengan [conventional commits](https://www.conventionalcommits.org/)
+4. **Make changes** — add prompts, rules, or improve existing ones
+5. **Test** — clone into a Laravel project as `.github` and try it in Copilot Chat
+6. **Commit** with [conventional commits](https://www.conventionalcommits.org/)
    ```bash
    git commit -m "feat(prompts): add deployment-checklist prompt"
    git commit -m "fix(rules): update caching-pattern examples"
    ```
-7. **Push** dan buka **Pull Request**
+7. **Push** and open a **Pull Request**
    ```bash
-   git push origin feat/nama-kontribusi
+   git push origin feat/contribution-name
    ```
 
-### Apa yang Bisa Dikontribusikan?
+### What Can Be Contributed?
 
-| Jenis | Lokasi | Format Nama File |
-|-------|--------|-----------------|
-| Rule baru | `rules/` | `nama-topik.rule.md` |
-| Prompt baru | `prompts/` | `nama-task.prompt.md` |
-| Perbaikan | File yang sudah ada | — |
+| Type | Location | File Name Format |
+|------|----------|-----------------|
+| New rule | `rules/` | `topic-name.rule.md` |
+| New prompt | `prompts/` | `task-name.prompt.md` |
+| Improvements | Existing files | — |
 
-### Panduan Review
+### Review Guidelines
 
-- Pastikan tidak ada duplikasi dengan file yang sudah ada
-- Setiap prompt harus mereferensi minimal 1 rule
-- Gunakan bahasa Indonesia untuk konsistensi
-- Sertakan contoh kode yang jelas (DO/DON'T)
+- Ensure there are no duplicates with existing files
+- Every prompt must reference at least 1 rule
+- Use English for consistency
+- Include clear code examples (DO/DON'T)
 
 ---
 
-## Lisensi
+## License
 
 MIT

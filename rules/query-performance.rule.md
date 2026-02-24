@@ -1,22 +1,22 @@
 # Rule: Query Performance & Data Fetching
 
-Kamu adalah seorang Engineer yang sadar performa. Setiap query yang kamu tulis harus mempertimbangkan **query count**, **memory usage**, dan **scalability**. Kamu tidak pernah mengandalkan lazy loading secara implisit, tidak pernah melakukan over-fetching, dan tidak pernah menggunakan JSON sebagai alat transformasi data internal.
+You are a performance-conscious Engineer. Every query you write must consider **query count**, **memory usage**, and **scalability**. You never rely on implicit lazy loading, never over-fetch data, and never use JSON as an internal data transformation tool.
 
-**Golden Rule: "Ambil data seminimal mungkin, sedekat mungkin ke database."**
+**Golden Rule: "Fetch as little data as possible, as close to the database as possible."**
 
 ---
 
-## 1. Eager Loading — Cegah N+1 Query
+## 1. Eager Loading — Prevent N+1 Query
 
-### DO: Gunakan `with()` untuk Eager Loading
+### DO: Use `with()` for Eager Loading
 
 ```php
-// ✅ Satu query (atau minimal) untuk seluruh hierarchy relasi
+// ✅ One query (or minimal) for the entire relation hierarchy
 $organizations = Organization::with([
     'branches.departments.teams.projects'
 ])->get();
 
-// ✅ Definisikan relasi di Model, bukan di controller/service
+// ✅ Define relations in the Model, not in controller/service
 class Organization extends Model
 {
     public function branches()
@@ -26,101 +26,101 @@ class Organization extends Model
 }
 ```
 
-### DON'T: Query di Dalam Loop
+### DON'T: Query Inside a Loop
 
 ```php
-// ❌ N+1: setiap iterasi memicu query baru
+// ❌ N+1: each iteration triggers a new query
 $organizations = Organization::all();
 foreach ($organizations as $org) {
-    $branches = $org->branches; // Lazy load per iterasi!
+    $branches = $org->branches; // Lazy load per iteration!
     foreach ($branches as $branch) {
-        $departments = $branch->departments; // Lagi query!
+        $departments = $branch->departments; // Another query!
     }
 }
 ```
 
-**Dampak tanpa eager loading:**
-- Query dieksekusi berulang kali (bisa ratusan/ribuan)
-- Latensi meningkat drastis
-- Masalah bukan pada Laravel, tapi pada **pola penggunaan**
+**Impact without eager loading:**
+- Queries executed repeatedly (can be hundreds/thousands)
+- Latency increases dramatically
+- The problem isn't Laravel, it's the **usage pattern**
 
-**Prinsip:**
-1. Hindari N+1 Query — selalu
-2. Relasi ditulis sekali di Model, dipakai selamanya
-3. Query eksplisit > implicit loading
+**Principles:**
+1. Avoid N+1 Query — always
+2. Relations are written once in the Model, used forever
+3. Explicit query > implicit loading
 
 ---
 
-## 2. Penggunaan `pluck()` untuk Efisiensi
+## 2. Using `pluck()` for Efficiency
 
-### DO: Gunakan `Model::pluck()` Langsung
+### DO: Use `Model::pluck()` Directly
 
 ```php
-// ✅ Query langsung ke kolom yang dibutuhkan, tanpa hydration model
+// ✅ Query directly for needed columns, no model hydration
 $emails = Employee::pluck('email', 'id')->toArray();
 // SQL: SELECT `email`, `id` FROM `employees`
 ```
 
-### DON'T: `all()` Lalu `pluck()`
+### DON'T: `all()` Then `pluck()`
 
 ```php
-// ❌ Over-fetching: SELECT * lalu filter di PHP
+// ❌ Over-fetching: SELECT * then filter in PHP
 $emails = Employee::all()->pluck('email', 'id')->toArray();
-// SQL: SELECT * FROM `employees` → buat Collection penuh → baru pluck
+// SQL: SELECT * FROM `employees` → create full Collection → then pluck
 ```
 
-**Perbandingan:**
+**Comparison:**
 
-| Aspek | `Model::pluck()` (✅) | `Model::all()->pluck()` (❌) |
+| Aspect | `Model::pluck()` (✅) | `Model::all()->pluck()` (❌) |
 |---|---|---|
 | SQL | `SELECT email, id` | `SELECT *` |
-| Memory | Rendah (hanya 2 kolom) | Tinggi (semua kolom + model objects) |
-| Hydration | Tidak ada | Semua record di-hydrate |
-| Kecepatan | Cepat | Lambat seiring data bertambah |
+| Memory | Low (only 2 columns) | High (all columns + model objects) |
+| Hydration | None | All records hydrated |
+| Speed | Fast | Slower as data grows |
 
-**Anti-pattern:** "Karena akhirnya butuh Collection, maka pakai `all()` dulu." → Ini salah untuk data besar.
+**Anti-pattern:** "Since I eventually need a Collection, I'll use `all()` first." → This is wrong for large datasets.
 
 ---
 
-## 3. Larangan `json_encode` / `json_decode` untuk Transformasi Data
+## 3. Prohibition of `json_encode` / `json_decode` for Data Transformation
 
-### DO: Gunakan Laravel Collection API / DTO / Resource
+### DO: Use Laravel Collection API / DTO / Resource
 
 ```php
-// ✅ Jika menggunakan Query Builder:
+// ✅ If using Query Builder:
 $results = DB::table('table')->get()->toArray();
 
-// ✅ Jika menggunakan Eloquent:
+// ✅ If using Eloquent:
 $results = Model::query()->get()->toArray();
 
-// ✅ Jika tetap menggunakan DB::select():
+// ✅ If still using DB::select():
 $results = collect($resultQuery)
     ->map(fn ($row) => (array) $row)
     ->toArray();
 ```
 
-### DON'T: JSON Encode-Decode untuk Casting
+### DON'T: JSON Encode-Decode for Casting
 
 ```php
-// ❌ Code Smell: JSON sebagai alat konversi internal
+// ❌ Code Smell: JSON as an internal conversion tool
 $resultQuery = DB::select($sql, ['id' => $id]);
 return json_decode(json_encode($resultQuery), true);
 ```
 
-**Mengapa ini Code Smell:**
-1. `json_encode()` → mahal di CPU, membuat copy data baru
-2. Tidak type-safe — kehilangan informasi tipe
-3. Menyembunyikan desain data yang buruk
-4. Biasanya tanda: struktur data tidak jelas, boundary layer tidak tegas, tidak ada DTO/Resource layer
+**Why this is a Code Smell:**
+1. `json_encode()` → expensive on CPU, creates a copy of data
+2. Not type-safe — loses type information
+3. Hides poor data design
+4. Usually a sign of: unclear data structure, vague layer boundaries, no DTO/Resource layer
 
-**Clean Code Principle:** "Jangan gunakan format pertukaran data (JSON) sebagai alat manipulasi internal."
+**Clean Code Principle:** "Do not use a data exchange format (JSON) as an internal manipulation tool."
 
 ---
 
-## Checklist Sebelum Menulis Query
+## Checklist Before Writing Queries
 
-- [ ] Apakah semua relasi yang dibutuhkan sudah di-eager load dengan `with()`?
-- [ ] Apakah hanya kolom yang dibutuhkan yang diambil? (gunakan `select()` atau `pluck()`)
-- [ ] Apakah ada query di dalam loop? (pindahkan ke eager loading)
-- [ ] Apakah ada `json_encode`/`json_decode` untuk konversi? (ganti dengan Collection/DTO)
-- [ ] Apakah menggunakan `all()` padahal hanya butuh beberapa kolom?
+- [ ] Are all required relations eager loaded with `with()`?
+- [ ] Are only necessary columns being fetched? (use `select()` or `pluck()`)
+- [ ] Are there queries inside loops? (move to eager loading)
+- [ ] Is there any `json_encode`/`json_decode` for conversion? (replace with Collection/DTO)
+- [ ] Is `all()` being used when only a few columns are needed?

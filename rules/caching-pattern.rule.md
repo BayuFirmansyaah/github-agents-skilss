@@ -1,27 +1,27 @@
 # Rule: Caching Pattern & View Composer
 
-Kamu adalah seorang Engineer yang membangun sistem cache yang **konsisten**, **mudah di-invalidasi**, dan **tidak menimbulkan data stale**. Cache bukan sumber kebenaran — Model adalah single source of truth. Kamu juga memahami bahwa View Composer adalah **data glue, bukan data processor**.
+You are an Engineer who builds a cache system that is **consistent**, **easy to invalidate**, and **does not cause stale data**. Cache is not the source of truth — the Model is the single source of truth. You also understand that View Composer is a **data glue, not a data processor**.
 
 ---
 
-## Bagian 1: Standarisasi Pola Cache
+## Part 1: Cache Pattern Standardization
 
-### Arsitektur Cache yang Dianjurkan
+### Recommended Cache Architecture
 
 ```
 Model (source of truth)
     ↓
-Cache Class (menyimpan data siap pakai)
+Cache Class (stores ready-to-use data)
     ↓
 Observer / Trait (auto-invalidation)
     ↓
-View / Service (hanya MEMBACA cache, tidak membangun ulang)
+View / Service (only READS cache, does not rebuild)
 ```
 
-### DO: Satu Cache Class per Domain Data
+### DO: One Cache Class per Data Domain
 
 ```php
-// ✅ Dedicated Cache Class dengan key eksplisit
+// ✅ Dedicated Cache Class with explicit key
 class JenisOutputCache
 {
     const KEY = 'jenis_output:options';
@@ -45,7 +45,7 @@ class JenisOutputCache
 ### DO: Auto-Invalidation via Model Observer
 
 ```php
-// ✅ Cache otomatis ter-invalidasi saat data berubah
+// ✅ Cache automatically invalidated when data changes
 class JenisOutputObserver
 {
     public function created(JenisOutput $model): void
@@ -65,10 +65,10 @@ class JenisOutputObserver
 }
 ```
 
-### DO: Alternatif Auto-Invalidation via Trait
+### DO: Alternative Auto-Invalidation via Trait
 
 ```php
-// ✅ Trait reusable untuk auto cache invalidation
+// ✅ Reusable trait for auto cache invalidation
 namespace App\Models\Traits;
 
 trait ClearCache
@@ -87,70 +87,70 @@ trait ClearCache
 }
 ```
 
-### DON'T: Cache Tersebar Tanpa Standar
+### DON'T: Scattered Cache Without Standards
 
 ```php
-// ❌ Cache di controller acak — tidak terpusat
+// ❌ Cache in random controller — not centralized
 public function index()
 {
     return Cache::remember('jenis_output', 86400, function () {
-        return JenisOutput::all(); // over-fetching juga!
+        return JenisOutput::all(); // over-fetching too!
     });
 }
 
-// ❌ rememberForever tanpa invalidasi — data stale selamanya
+// ❌ rememberForever without invalidation — stale data forever
 Cache::rememberForever('jenis_output', function () {
     return JenisOutput::pluck('nama', 'id');
 });
 ```
 
-### Prinsip Cache (Wajib)
+### Cache Principles (Mandatory)
 
-| Prinsip | Penjelasan |
+| Principle | Explanation |
 |---|---|
-| Cache bukan sumber kebenaran | Model = single source of truth |
-| Cache harus mudah dihapus | Gunakan Cache Class dengan `clear()` |
-| Cache harus terpusat | Satu class per domain, bukan tersebar |
-| Cache harus otomatis ter-invalidate | Gunakan Observer atau Trait |
-| Key cache harus eksplisit & terdokumentasi | Gunakan konstanta, bukan string acak |
+| Cache is not the source of truth | Model = single source of truth |
+| Cache must be easy to clear | Use Cache Class with `clear()` |
+| Cache must be centralized | One class per domain, not scattered |
+| Cache must auto-invalidate | Use Observer or Trait |
+| Cache key must be explicit & documented | Use constants, not random strings |
 
-### Risiko Jika Diabaikan
+### Risks If Ignored
 
-- Bug sulit direproduksi (hanya muncul di production)
-- Inconsistent behavior antar modul
-- Refactor mahal & berisiko
-- Data stale yang tidak terdeteksi
+- Hard-to-reproduce bugs (only appear in production)
+- Inconsistent behavior across modules
+- Expensive & risky refactoring
+- Undetected stale data
 
 ---
 
-## Bagian 2: View Composer
+## Part 2: View Composer
 
-### Bahaya View Composer yang Salah Pakai
+### Danger of Misused View Composer
 
-View Composer dipanggil **setiap kali view/partial dirender**. Dalam satu halaman bisa terjadi:
-- 5–10x pemanggilan
-- Loop permission berulang
-- Query redundant
+View Composer is called **every time a view/partial is rendered**. On a single page this can mean:
+- 5–10x invocations
+- Repeated permission loops
+- Redundant queries
 
 ### DO: Memoize per-Request
 
 ```php
-// ✅ Kalkulasi berat HANYA SEKALI per request
+// ✅ Heavy computation ONLY ONCE per request
 protected static $viewCache = null;
 
 public function handle(Request $request, Closure $next)
 {
     View::composer(['*::pages.*', '*::livewire.*'], function ($view) use ($request) {
-        // Cek apakah sudah pernah dihitung di request ini
+        // Check if already computed in this request
         if (is_null(self::$viewCache)) {
             $viewData = $view->getData();
             self::$viewCache = Page::buildViewData(
                 module: 'spmi',
                 menu: Menu::navbar(),
-                // ... parameter lainnya
+                // ... other parameters
             );
         }
-        // Reuse data dari cache
+        // Reuse data from cache
         View::share(self::$viewCache);
     });
 
@@ -158,10 +158,10 @@ public function handle(Request $request, Closure $next)
 }
 ```
 
-### DON'T: Kalkulasi Berat di Setiap Render
+### DON'T: Heavy Computation on Every Render
 
 ```php
-// ❌ Setiap kali view dirender, kalkulasi berat dijalankan ulang
+// ❌ Every time the view is rendered, heavy computation runs again
 public function handle(Request $request, Closure $next)
 {
     View::composer(['*::pages.*', '*::livewire.*'], function ($view) {
@@ -169,7 +169,7 @@ public function handle(Request $request, Closure $next)
         View::share(
             Page::buildViewData(
                 module: 'spmi',
-                menu: Menu::navbar(), // Query setiap render!
+                menu: Menu::navbar(), // Query on every render!
                 sidebar: $viewData['sidebar'] ?? null,
             )
         );
@@ -179,9 +179,9 @@ public function handle(Request $request, Closure $next)
 }
 ```
 
-### Rule of Thumb untuk View Composer
+### Rule of Thumb for View Composer
 
-1. View Composer = **data glue**, bukan data processor
-2. Jika berat → **cache** (minimal per-request memoization)
-3. Jika kompleks → **pindahkan ke Service**
-4. Jangan taruh query berat, permission loop, atau recursive array build di View Composer
+1. View Composer = **data glue**, not a data processor
+2. If heavy → **cache** (at minimum per-request memoization)
+3. If complex → **move to a Service**
+4. Do not put heavy queries, permission loops, or recursive array builds in View Composer
