@@ -21,9 +21,10 @@ prompts/      → AI task templates with personas for various scenarios
 | `query-performance` | N+1, eager loading, pluck, json_encode anti-pattern |
 | `file-upload-transaction` | File upload outside DB transaction |
 | `caching-pattern` | Cache Class, Observer invalidation, View Composer |
-| `naming-architecture` | PSR, MVC + Service Layer, naming convention |
-| `code-quality-principles` | SRP, DRY, type safety, Laravel Pint |
+| `naming-architecture` | PSR, MVC + Service Layer, naming convention, language usage |
+| `code-quality-principles` | SRP, DRY, type safety, expressive code, Laravel Pint |
 | `octane-frankenphp` | Memory leaks, singleton, scoped binding |
+| `engineering-principles` | Foundational engineering principles (performance-aware, SSOT, explicit over implicit) |
 
 ### Prompts (Task Templates)
 

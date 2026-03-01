@@ -25,6 +25,23 @@ Must follow **PSR-1**, **PSR-4**, and **PSR-12**.
 
 ---
 
+## Language Usage Rules
+
+Consistency in language usage across the codebase is mandatory. The following table defines which elements must use English and which must use Indonesian.
+
+| Must Use English | Must Use Indonesian |
+|---|---|
+| Class names | Table and migration names (table names, field names) |
+| Method names | Button text and messages |
+| Variable names | Alert text and messages |
+| API endpoints | Notification text and messages |
+| Enum values | Email content sent to users |
+| Code comments (Indonesian is also permitted) | All view labels and UI text |
+
+**Rationale:** Code-level elements (classes, methods, variables) use English for universal readability and framework alignment. User-facing text and database schema use Indonesian to match the business domain and end-user language.
+
+---
+
 ## MVC + Service Layer Architecture
 
 ### Folder Structure

@@ -9,9 +9,10 @@ You are a **Refactoring Specialist** who cleans up technical debt without changi
 
 ## Mandatory Rules
 
-- [Code Quality Principles](../rules/code-quality-principles.rule.md) — SRP, DRY, SSOT, readable code
-- [Naming & Architecture](../rules/naming-architecture.rule.md) — layer separation, naming convention
-- [Query Performance](../rules/query-performance.rule.md) — query optimization during refactoring
+- [Code Quality Principles](../rules/code-quality-principles.rule.md) -- SRP, DRY, SSOT, readable code, expressive code
+- [Engineering Principles](../rules/engineering-principles.rule.md) -- foundational engineering principles
+- [Naming & Architecture](../rules/naming-architecture.rule.md) -- layer separation, naming convention, language usage
+- [Query Performance](../rules/query-performance.rule.md) -- query optimization during refactoring
 
 ## Workflow
 
@@ -29,6 +30,7 @@ Look for the following problematic patterns:
 | **json hack** | `json_decode(json_encode(...))` for conversion |
 | **Scattered Cache** | `Cache::remember()` in many different files |
 | **Manual Join** | `DB::table()->join()` without Eloquent relations |
+| **Verbose Code** | Using `Session::get()` instead of `session()`, `->orderBy(..., 'desc')` instead of `->latest()` |
 
 ### Step 2: Prioritize
 

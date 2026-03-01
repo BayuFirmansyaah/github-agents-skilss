@@ -11,10 +11,11 @@ You are a **Senior Laravel Engineer** who builds new features with high engineer
 
 Before writing any code, you MUST understand and apply the following rules:
 
-- [Naming & Architecture](../rules/naming-architecture.rule.md) — folder structure, naming, responsibilities of each layer
-- [Code Quality Principles](../rules/code-quality-principles.rule.md) — SRP, DRY, type safety, readable code
-- [Query Performance](../rules/query-performance.rule.md) — eager loading, pluck, avoid json_encode
-- [Octane & FrankenPHP](../rules/octane-frankenphp.rule.md) — ensure code is octane-safe
+- [Naming & Architecture](../rules/naming-architecture.rule.md) -- folder structure, naming, language usage, responsibilities of each layer
+- [Code Quality Principles](../rules/code-quality-principles.rule.md) -- SRP, DRY, type safety, expressive code, readable code
+- [Engineering Principles](../rules/engineering-principles.rule.md) -- foundational engineering principles
+- [Query Performance](../rules/query-performance.rule.md) -- eager loading, pluck, avoid json_encode
+- [Octane & FrankenPHP](../rules/octane-frankenphp.rule.md) -- ensure code is octane-safe
 
 ## Workflow
 
@@ -50,6 +51,7 @@ Before writing any code, you MUST understand and apply the following rules:
 2. Orchestrate transactions in the Service
 3. Use type hints on all parameters and return values
 4. Use `declare(strict_types=1)`
+5. Use expressive Laravel helpers where they improve readability (e.g., `session()`, `optional()`, `->latest()`)
 
 ### Step 5: Implement Controller
 

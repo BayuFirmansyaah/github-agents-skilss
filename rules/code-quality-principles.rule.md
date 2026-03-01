@@ -32,7 +32,29 @@ $totalRevenue = $paidOrders->sum(function ($order) {
 
 ---
 
-## 2. Consistency Over Preference
+## 2. Expressive and Concise Code
+
+Laravel provides helpers and shortcuts to improve code clarity. Use them when they make the code **more readable**, not just shorter.
+
+### Preferred Patterns
+
+| Instead Of | Use | Reason |
+|---|---|---|
+| `Session::get('key')` | `session('key')` | Shorter, idiomatic Laravel |
+| `->orderBy('created_at', 'desc')` | `->latest()` | More expressive |
+| `$user ? $user->name : null` | `optional($user)->name` | Null-safe, no conditional |
+| `Request::input('key')` | `request('key')` | Shorter, idiomatic Laravel |
+| `Config::get('app.name')` | `config('app.name')` | Shorter, idiomatic Laravel |
+
+### Boundary
+
+Do not force shortcuts when they reduce clarity. The rule from Section 1 still applies: **readable before clever**. If a helper obscures intent or makes debugging harder, use the explicit form.
+
+**Rule of thumb:** "If a reviewer has to pause for more than 3 seconds to understand a single line of code, that line needs to be simplified."
+
+---
+
+## 3. Consistency Over Preference
 
 Team consistency is more important than individual developer style.
 - If the team agrees to use Service Class → everyone uses Service Class
@@ -40,7 +62,7 @@ Team consistency is more important than individual developer style.
 
 ---
 
-## 3. Single Source of Truth (SSOT)
+## 4. Single Source of Truth (SSOT)
 
 There must be no duplication of business logic. The same rule MUST NOT be written in more than one place.
 
@@ -76,7 +98,7 @@ if (! $order->isPaid()) { ... }
 
 ---
 
-## 4. Single Responsibility Principle (SRP)
+## 5. Single Responsibility Principle (SRP)
 
 Every class and method should have only **one responsibility**.
 
@@ -94,7 +116,7 @@ Every class and method should have only **one responsibility**.
 
 ---
 
-## 5. Don't Repeat Yourself (DRY)
+## 6. Don't Repeat Yourself (DRY)
 
 Every business rule must have a single source of truth.
 
@@ -114,7 +136,7 @@ Every business rule must have a single source of truth.
 
 ---
 
-## 6. Type Safety & Code Contracts
+## 7. Type Safety & Code Contracts
 
 ### Type Declaration (Mandatory)
 
@@ -151,7 +173,7 @@ Used for:
 
 ---
 
-## 7. Code Style & Laravel Pint
+## 8. Code Style & Laravel Pint
 
 **Laravel Pint** is mandatory as the standard formatter.
 
@@ -166,7 +188,7 @@ Used for:
 
 ---
 
-## 8. Prohibition of Overriding Laravel Core Features
+## 9. Prohibition of Overriding Laravel Core Features
 
 ### Prohibited
 

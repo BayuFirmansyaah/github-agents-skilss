@@ -78,7 +78,18 @@ $emails = Employee::all()->pluck('email', 'id')->toArray();
 | Hydration | None | All records hydrated |
 | Speed | Fast | Slower as data grows |
 
-**Anti-pattern:** "Since I eventually need a Collection, I'll use `all()` first." → This is wrong for large datasets.
+**Anti-pattern:** "Since I eventually need a Collection, I'll use `all()` first." This is wrong for large datasets.
+
+### When Multiple Columns Are Needed
+
+If you need more than a key-value pair but not all columns, use `select()`:
+
+```php
+// When you need specific columns (not just key-value):
+$users = User::select('id', 'name', 'email')->where('active', true)->get();
+```
+
+This fetches only the required columns without full model hydration overhead.
 
 ---
 
